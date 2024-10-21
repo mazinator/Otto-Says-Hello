@@ -28,7 +28,7 @@ It can be concluded that the Othello game has the following properties / leads t
 
 Oh noo, such a complex problem. So what should we do? Neural nets to the rescue :rocket:
 
-Otto's goal is to beat the current performances of Othello-bots, at least compared to the computational cost. 
+Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
 The following papers seem as an interesting starting point into this subject:
 - [OLIVAW: Mastering Othello without Human Knowledge, nor a Fortune](https://arxiv.org/abs/2103.17228). This paper from 2021 aims to minimze the computational power needed to achieve the performance of the state of the art, which covers the aspect of keeping computational cost as low as possible.
@@ -39,4 +39,18 @@ The following papers seem as an interesting starting point into this subject:
 A few more interesting links on this topic:
 - [GymOthelloEnv](https://github.com/lerrytang/GymOthelloEnv)
 
-asdf
+Data of real played othello games are rather easy to find on the web, e.g. [https://www.kaggle.com/datasets/andrefpoliveira/othello-games](https://www.kaggle.com/datasets/andrefpoliveira/othello-games).
+
+However, three different approaches will be implemented:
+- train on human-generated games only
+- train on simulated games only
+- train on human-generated games, afterwards on simulated ones
+
+
+## Intended work-packages
+
+- Read through papers above to fully grasp state-of-the-art-approaches (10h)
+- Set up infrastructure (15h)
+- Implement SOFA (25h)
+- Implement the approaches mentioned above (10h each)
+- Finetune Neural Net, try out different architectures (25h)
