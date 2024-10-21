@@ -54,5 +54,5 @@ However, three different approaches will be implemented:
 - Implement SOFA (25h)
 - Implement the approaches mentioned above (10h each)
 - Finetune Neural Net, try out different architectures (25h)
-- Using an existing application to showcase the results (2)
+- Using an existing application to showcase the results (5h)
 - Final report and presentation (5h)
