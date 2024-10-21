@@ -15,7 +15,7 @@ After watching a few "how to beat everyone in Othello"-videos, the following see
 
 * try to control the inner 4x4 matrix
 * try evolving to the wall, as these spots (especially the corners) have a big advantage
-* don't waste you move on non-flipping actions
+* don't waste your move on non-flipping actions
 * having less pieces than the opponent is not a bad thing, if parts of the inner 4x4 and a few spots on the walls are presevered. Having more pieces leads to more possible positions from where stones can be flipped.
 
 
