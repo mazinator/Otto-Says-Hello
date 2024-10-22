@@ -31,7 +31,7 @@ The following papers seem as an interesting starting point into this subject:
 - [Hierarchical Reinforcement Learning for the Game of Othello](https://ir.canterbury.ac.nz/bitstreams/51750833-63c1-42a6-b7bf-08ecd4c58434/download)
 - [Q-learning adaptations in the game Othello](https://fse.studenttheses.ub.rug.nl/id/eprint/23027)
 
-A few more interesting links on this topic:
+Another interesting link on this topic:
 - [GymOthelloEnv](https://github.com/lerrytang/GymOthelloEnv)
 
 Data of real played othello games are rather easy to find on the web, e.g. [https://www.kaggle.com/datasets/andrefpoliveira/othello-games](https://www.kaggle.com/datasets/andrefpoliveira/othello-games).
