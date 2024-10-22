@@ -47,7 +47,7 @@ However, three different approaches will be implemented:
 
 - Read through papers above to fully grasp state-of-the-art-approaches (10h)
 - Set up infrastructure (15h)
-- Implement SOFA (25h)
+- Implement SOFA (Q-learning) (25h)
 - Implement the approaches mentioned above (10h each)
 - Finetune Neural Net, try out different architectures (25h)
 - Using an existing application to showcase the results (5h)
