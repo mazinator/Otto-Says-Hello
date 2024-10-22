@@ -17,8 +17,7 @@ After watching a few "how to beat everyone in Othello"-videos, the following see
 
 It can be concluded that the Othello game has the following properties / leads to the following conclusions:
 1. It is markov (the future is only dependent on the current state, not the past)
-2. Its state space is too big for a tabular solution
-3. It is not possible to calculate all possible states
+2. Its state space is too big for a tabular solution, i.e. it is computationally not feasible to calculate all states
 4. It is a game where short-term decisions can heavily influence the final outcome
 5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options of assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
