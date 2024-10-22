@@ -21,7 +21,7 @@ It can be concluded that the Othello game has the following properties / leads t
 4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly reduces the chance of winning)
 5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options of assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
-Oh noo, such a complex problem. So what should we do? Neural nets to the rescue :rocket:
+Oh noo, such a complex problem. So what should we do? Deep Reinforcement Learning to the rescue :rocket:
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
