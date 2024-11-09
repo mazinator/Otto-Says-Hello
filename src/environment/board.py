@@ -23,7 +23,7 @@ A small recap of the rules:
 """
 
 import numpy as np
-
+import copy
 
 class OthelloBoard:
     def __init__(self, rows=8, cols=8):
@@ -67,4 +67,80 @@ class OthelloBoard:
             row_content = " ".join(symbols[self.board[row, col]] for col in range(self.cols))
             print(row_label + row_content)
 
-    #def make_move(self):
+    def is_valid_move(self, row, col, player):
+        """Checks if placing a disk at (row, col) is a valid move for the player."""
+        # Ensure the position is empty; if not, return False immediately
+        if self.board[row, col] != -1:
+            return False  # Position is not empty
+
+        # Define opponent and directions for checking
+        opponent = 1 if player == 0 else 0
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+
+        # Check all directions to see if placing a disk would outflank opponent's disks
+        for dr, dc in directions:
+            r, c = row + dr, col + dc
+            found_opponent = False
+            while 0 <= r < self.rows and 0 <= c < self.cols:
+                if self.board[r, c] == opponent:
+                    found_opponent = True
+                elif self.board[r, c] == player:
+                    if found_opponent:
+                        return True  # Valid move as it can flip opponent's disks
+                    else:
+                        break
+                else:
+                    break
+                r += dr
+                c += dc
+
+        return False  # No direction had a valid flip; return False
+
+    def make_move(self, position, player):
+        """Makes a move for the player if it's valid, placing a disk and flipping appropriate disks."""
+        try:
+            # Check if position is a tuple like ('B', 5)
+            if isinstance(position, tuple):
+                col, row = position
+            else:
+                # If it's a single string like 'B5'
+                col, row = position[0], position[1:]
+
+            col_idx = ord(col.upper()) - ord('A')
+            row_idx = int(row) - 1
+        except (IndexError, ValueError):
+            print("Invalid input format. Use format like 'B5' or ('B', 5).")
+            return False
+
+        if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
+            raise ValueError("Move is out of bounds.")
+
+        if not self.is_valid_move(row_idx, col_idx, player):
+            raise ValueError("Invalid move.")
+
+        self.board[row_idx, col_idx] = player
+        self.flip_disks(row_idx, col_idx, player)
+        return True
+
+    def flip_disks(self, row, col, player):
+        """Flips the disks in all valid directions from (row, col) for the player."""
+        opponent = 1 if player == 0 else 0
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+
+        for dr, dc in directions:
+            disks_to_flip = []
+            r, c = row + dr, col + dc
+            while 0 <= r < self.rows and 0 <= c < self.cols:
+                if self.board[r, c] == opponent:
+                    disks_to_flip.append((r, c))
+                elif self.board[r, c] == player:
+                    for rr, cc in disks_to_flip:
+                        self.board[rr, cc] = player
+                    break
+                else:
+                    break
+                r += dr
+                c += dc
+
+    def copy(self):
+        return copy.deepcopy(self)
