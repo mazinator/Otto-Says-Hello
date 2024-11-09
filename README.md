@@ -51,3 +51,20 @@ However, three different approaches will be implemented:
 - Finetune Neural Net, try out different architectures (35h)
 - Using an existing application to showcase the results (5h)
 - Final report and presentation (5h)
+
+
+notes: 
+- auf versch. strategies trainieren: z.B. take as less / much pieces as possible
+- sweet 16? bleibt das game eher in der mitte?
+- äußerer Rand wird von mtte nach rand in B,A,C unterteilt.
+- 1 rein auf beiden achsen richtung mitte sind X squares, die sind sehr wichtig anscheinend
+- strategy: taking as less pieces as possible
+- don't play the X squares -> von dort am ehesten der jump in die ecke
+- gedankengang: mehrere flippen kann gut sein -> falls keine neuen moves
+für den gegner entstehen
+- maximizing no. of moves 
+- change of strategies, zb mit minimizing starten und dann spätere
+'facts' reintrainieren?
+- szenarien/konkrete wichtige spielsituationen irgendwie spezifischer ins training einbauen?
+
+WICHTIG: https://github.com/2Bear/othello-zero
