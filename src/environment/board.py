@@ -99,18 +99,20 @@ class OthelloBoard:
     def make_move(self, position, player):
         """Makes a move for the player if it's valid, placing a disk and flipping appropriate disks."""
         try:
-            # Check if position is a tuple like ('B', 5)
-            if isinstance(position, tuple):
-                col, row = position
-            else:
-                # If it's a single string like 'B5'
+            if isinstance(position, tuple) and len(position) == 2 and all(isinstance(i, int) for i in position):
+                # Position is given as (row, col) with 0-based indexing
+                row_idx, col_idx = position
+            elif isinstance(position, str) and len(position) >= 2:
+                # Position is given as a string like 'B5'
                 col, row = position[0], position[1:]
-
-            col_idx = ord(col.upper()) - ord('A')
-            row_idx = int(row) - 1
+                col_idx = ord(col.upper()) - ord('A')
+                row_idx = int(row) - 1
+            else:
+                raise ValueError("Invalid input format. Use 'B5' or (1, 4) with 0-based indexing.")
         except (IndexError, ValueError):
-            print("Invalid input format. Use format like 'B5' or ('B', 5).")
+            print("Invalid input format. Use format like 'B5' or (1, 4) with 0-based indexing.")
             return False
+
 
         if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
             raise ValueError("Move is out of bounds.")
