@@ -97,7 +97,11 @@ class OthelloBoard:
         return False  # No direction had a valid flip; return False
 
     def make_move(self, position, player):
-        """Makes a move for the player if it's valid, placing a disk and flipping appropriate disks."""
+        """
+        Makes a move for the player if it's valid, placing a disk and flipping appropriate disks.
+
+        Returns player who makes the next move (same player, if other player cannot do a move)
+        """
         try:
             if isinstance(position, tuple) and len(position) == 2 and all(isinstance(i, int) for i in position):
                 # Position is given as (row, col) with 0-based indexing
@@ -122,7 +126,13 @@ class OthelloBoard:
 
         self.board[row_idx, col_idx] = player
         self.flip_disks(row_idx, col_idx, player)
-        return True
+
+        # Check if other player can make a move, otherwise return same player
+        otherPlayer = 1 if player == 0 else 0
+        if len(self.get_valid_moves(otherPlayer)) == 0:
+            return player
+        else:
+            return otherPlayer
 
     def flip_disks(self, row, col, player):
         """Flips the disks in all valid directions from (row, col) for the player."""
@@ -143,6 +153,22 @@ class OthelloBoard:
                     break
                 r += dr
                 c += dc
+
+    def get_valid_moves(self, player):
+        """
+        Returns a list of valid moves for the given player.
+        Each move is represented as a tuple (row, col).
+
+        player: 0 for black, 1 for white
+        """
+        valid_moves = []
+
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.board[row, col] == -1 and self.is_valid_move(row, col, player):
+                    valid_moves.append((row, col))
+
+        return valid_moves
 
     def copy(self):
         return copy.deepcopy(self)

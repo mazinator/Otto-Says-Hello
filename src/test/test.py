@@ -3,7 +3,7 @@ some test to verify that various stuff is actually behaving as expected
 """
 from src.environment.board import OthelloBoard
 from src.test.test_utils import *
-import string
+import string, random
 
 def run_all_tests():
     print("Running tests..")
@@ -54,6 +54,16 @@ def run_all_tests():
         if move not in white_player_valid_moves:
             boardTemp = board.copy()
             try_invalid_move(boardTemp, move, 1)
+
+    print("finish game randomly..")
+    current_player = 1
+    current_valid_moves = board.get_valid_moves(current_player)
+
+    while len(current_valid_moves) > 0:
+        current_player = board.make_move(random.choice(current_valid_moves), current_player)
+        current_valid_moves = board.get_valid_moves(current_player)
+
+    board.print_board()
 
     print("\n\nAll tests passed!")
 
