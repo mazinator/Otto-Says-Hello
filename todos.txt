@@ -1,0 +1,1 @@
+1. return who's next, needs function player_has_available_moves(player). Also need available_moves(player)

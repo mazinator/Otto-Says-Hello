@@ -2,7 +2,7 @@
 \\\\\\\
 # Otto-Says-Hello
 
-Just Otto trying to beat everyone in Othello
+Otto trying to beat everyone in Othello.
 
 
 Otto is an AI bot trained with deep reinforcement learning to destroy any hopes of ever beating him in Othello. 
@@ -21,7 +21,7 @@ It can be concluded that the Othello game has the following properties / leads t
 4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly reduces the chance of winning)
 5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options of assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
-Oh noo, such a complex problem. So what should we do? Deep Reinforcement Learning to the rescue :rocket:
+Note: 8x8 Othello is claimed to be solved. Therefore, Otto will to be trained on a 10x10 configuration.
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
@@ -45,7 +45,7 @@ However, three different approaches will be implemented:
 ## Intended work-packages
 
 - Read through papers above to fully grasp state-of-the-art-approaches (10h)
-- Set up infrastructure (15h)
+- Set up infrastructure (15h). DONE: Simple Board-class, printing in the console and test to validate correctness took around 5h.
 - Implement SOFA (Q-learning) (15h)
 - Implement the approaches mentioned above (10h each)
 - Finetune Neural Net, try out different architectures (35h)

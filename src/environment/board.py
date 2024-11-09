@@ -36,22 +36,30 @@ class OthelloBoard:
         self.board = None
         self.rows = rows
         self.cols = cols
+        self.next_player = 0
 
         if self.rows < 6 or self.rows % 2 != 0 or self.cols < 6 or self.cols % 2 != 0:
             raise ValueError("rows or cols smaller than 6 or not even.")
 
+        self.initial_board = None
         self.reset_board()
 
     def reset_board(self):
-
         # Set all fields to -1
         self.board = np.full((self.rows, self.cols), -1)
 
         # Set inner 4 disks for beginning
-        self.board[self.rows // 2 - 1, self.cols // 2 - 1] = 0
-        self.board[self.rows // 2, self.cols // 2] = 0
-        self.board[self.rows // 2, self.cols // 2 - 1] = 1
-        self.board[self.rows // 2 - 1, self.cols // 2] = 1
+        self.board[self.rows // 2 - 1, self.cols // 2 - 1] = 1
+        self.board[self.rows // 2, self.cols // 2] = 1
+        self.board[self.rows // 2, self.cols // 2 - 1] = 0
+        self.board[self.rows // 2 - 1, self.cols // 2] = 0
+
+        # Save a copy of the initial board state
+        self.initial_board = self.board.copy()
+
+    def is_initial_state(self):
+        """Check if the board is in the initial state."""
+        return np.array_equal(self.board, self.initial_board)
 
     def print_board(self):
         """
@@ -100,7 +108,8 @@ class OthelloBoard:
         """
         Makes a move for the player if it's valid, placing a disk and flipping appropriate disks.
 
-        Returns player who makes the next move (same player, if other player cannot do a move)
+        Returns:
+            player who makes the next move (same player, if other player cannot do a move)
         """
         try:
             if isinstance(position, tuple) and len(position) == 2 and all(isinstance(i, int) for i in position):
@@ -117,6 +126,10 @@ class OthelloBoard:
             print("Invalid input format. Use format like 'B5' or (1, 4) with 0-based indexing.")
             return False
 
+        # Check if it is initial board state, if yes black MUST play
+        if player is not self.next_player:
+            player_name = "Black" if player == 0 else "White"
+            raise ValueError(f"It's {player_name}'s turn!")
 
         if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
             raise ValueError("Move is out of bounds.")
@@ -129,13 +142,21 @@ class OthelloBoard:
 
         # Check if other player can make a move, otherwise return same player
         otherPlayer = 1 if player == 0 else 0
-        if len(self.get_valid_moves(otherPlayer)) == 0:
-            return player
+
+        otherPlayer_valid_moves = self.get_valid_moves(otherPlayer)
+
+        if len(otherPlayer_valid_moves) == 0:
+            valid_moves = self.get_valid_moves(player)
+            self.next_player = player
         else:
-            return otherPlayer
+            valid_moves = otherPlayer_valid_moves
+            self.next_player = otherPlayer
+
+        return self.next_player, self.board, valid_moves
 
     def flip_disks(self, row, col, player):
         """Flips the disks in all valid directions from (row, col) for the player."""
+
         opponent = 1 if player == 0 else 0
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
 
