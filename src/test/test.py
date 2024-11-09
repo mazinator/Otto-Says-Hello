@@ -39,7 +39,19 @@ for move in all_moves:
         try_invalid_move(boardTemp, move, 0)
 print("let black play..")
 try_valid_move(board, "E3", 0)
+print("Field now for white player:")
 board.print_board()
 
+white_player_valid_moves = ['B2', 'C2', 'D2', 'E2', 'F2', 'F3', 'F4', 'F5', 'F6']
+print(f"white player is next and can do these moves: {white_player_valid_moves}")
+for move in white_player_valid_moves:
+    boardTemp = board.copy()
+    try_valid_move(boardTemp, move, 1)
 
-print("All tests passed!")
+print(f"white player should not be able to do any of the other moves..{[move for move in all_moves if move not in white_player_valid_moves]}")
+for move in all_moves:
+    if move not in white_player_valid_moves:
+        boardTemp = board.copy()
+        try_invalid_move(boardTemp, move, 1)
+
+print("\n\nAll tests passed!")
