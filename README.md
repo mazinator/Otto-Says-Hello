@@ -1,5 +1,6 @@
 ‼️ **UNDER CONSTRUCTION** ‼️
-\\
+
+
 # Otto-Says-Hello
 
 Otto trying to beat everyone in Othello.
@@ -11,17 +12,16 @@ After watching a few "how to beat everyone in Othello"-videos, the following see
 
 * try to control the inner 4x4 matrix
 * try evolving to the wall, as these spots (especially the corners) have a big advantage
-* don't waste your move on non-flipping actions
 * having less pieces than the opponent is not a bad thing, if parts of the inner 4x4 and a few spots on the walls are presevered. Having more pieces leads to more possible positions from where stones can be flipped.
 
 
 It can be concluded that the Othello game has the following properties / leads to the following conclusions:
 1. It is markov (the future is only dependent on the current state, not the past)
-2. Its state space is too big for a tabular solution, i.e. it is computationally not feasible to calculate all states
+2. Its state space is too big for a tabular solution, i.e. it is computationally not feasible to calculate all states (to be more precise, at least for a 10x10 field)
 4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly reduces the chance of winning)
-5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options of assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
+5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options I can think of for assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
-Note: 8x8 Othello is claimed to be solved. Therefore, Otto will to be trained on a 10x10 configuration.
+Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, later on a 10x10 or potentially even bigger configuration.
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
