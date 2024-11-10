@@ -1,5 +1,5 @@
 ‼️ **UNDER CONSTRUCTION** ‼️
-\\\\\\\
+\\
 # Otto-Says-Hello
 
 Otto trying to beat everyone in Othello.
