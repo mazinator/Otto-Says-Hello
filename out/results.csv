@@ -1,0 +1,12 @@
+BlackPlayer,WhitePlayer,Episodes,BlackWins,WhiteWins,Draws
+RandomAgent,MinAgent,50,31,16,3
+RandomAgent,MaxAgent,50,17,32,1
+MinAgent,MaxAgent,50,0,50,0
+MinAgent,MaxAgent,1000,111,871,18
+RandomAgent,MinAgent,50,28,21,1
+RandomAgent,MaxAgent,50,14,36,0
+MinAgent,MaxAgent,50,0,50,0
+MinAgent,MaxAgent,1000,137,855,8
+RandomAgent,MinAgent,50,29,20,1
+RandomAgent,MaxAgent,50,17,31,2
+MinAgent,MaxAgent,50,0,50,0

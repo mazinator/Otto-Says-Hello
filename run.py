@@ -1,4 +1,3 @@
-from src.environment.board import OthelloBoard
 from src.test.test import *
 import argparse
 

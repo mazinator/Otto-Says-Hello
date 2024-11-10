@@ -25,8 +25,9 @@ A small recap of the rules:
 import numpy as np
 import copy
 
+
 class OthelloBoard:
-    def __init__(self, rows=8, cols=8):
+    def __init__(self, rows=10, cols=10, first_player=0):
         """
         In order to always have a "middle" to set the first 4 stones,
         the restrictions on those params have been chosen as:
@@ -36,10 +37,13 @@ class OthelloBoard:
         self.board = None
         self.rows = rows
         self.cols = cols
-        self.next_player = 0
+        self.first_player_original = first_player
+        self.next_player = self.first_player_original
 
-        if self.rows < 6 or self.rows % 2 != 0 or self.cols < 6 or self.cols % 2 != 0:
-            raise ValueError("rows or cols smaller than 6 or not even.")
+        if (self.rows < 6 or self.rows % 2 != 0 or
+                self.cols < 6 or self.cols % 2 != 0 or
+                self.rows > 26 or self.cols > 26):
+            raise ValueError("rows or cols smaller than 6, bigger than 26 or not even.")
 
         self.initial_board = None
         self.reset_board()
@@ -57,22 +61,26 @@ class OthelloBoard:
         # Save a copy of the initial board state
         self.initial_board = self.board.copy()
 
+        self.next_player = self.first_player_original
+
     def is_initial_state(self):
         """Check if the board is in the initial state."""
         return np.array_equal(self.board, self.initial_board)
 
     def print_board(self):
         """
-        Prints the board with A-H column labels and 1-8 row labels.
+        Prints the board with A-H column labels and 1-8 (or more) row labels, with consistent spacing.
         """
         symbols = {-1: '-', 0: 'B', 1: 'W'}
-        column_labels = "  " + " ".join(chr(ord('A') + i) for i in range(self.cols))
-        print(column_labels)  # Print the column headers A-H
 
+        # Print the column labels with spacing
+        column_labels = "   " + "  ".join(chr(ord('A') + i) for i in range(self.cols))
+        print(column_labels)
+
+        # Print each row with row number (1-based index), ensuring consistent alignment
         for row in range(self.rows):
-            # Print each row with row number (1-based index)
-            row_label = f"{row + 1} "  # Adjust row index to 1-based
-            row_content = " ".join(symbols[self.board[row, col]] for col in range(self.cols))
+            row_label = f"{row + 1:2} "  # Format row label to take up 2 spaces for alignment
+            row_content = "  ".join(symbols[self.board[row, col]] for col in range(self.cols))
             print(row_label + row_content)
 
     def is_valid_move(self, row, col, player):
@@ -142,17 +150,24 @@ class OthelloBoard:
 
         # Check if other player can make a move, otherwise return same player
         otherPlayer = 1 if player == 0 else 0
+        winner = 0  # only changed below if game's finished
 
         otherPlayer_valid_moves = self.get_valid_moves(otherPlayer)
+        player_valid_moves = self.get_valid_moves(player)
 
-        if len(otherPlayer_valid_moves) == 0:
-            valid_moves = self.get_valid_moves(player)
-            self.next_player = player
+        if len(otherPlayer_valid_moves) == 0 and len(player_valid_moves) == 0:
+            winner = self.check_winner()
+            valid_moves = []
         else:
-            valid_moves = otherPlayer_valid_moves
-            self.next_player = otherPlayer
+            # If the other player has moves, they play next; otherwise, same player goes again
+            if len(otherPlayer_valid_moves) > 0:
+                valid_moves = otherPlayer_valid_moves
+                self.next_player = otherPlayer
+            else:
+                valid_moves = player_valid_moves
+                self.next_player = player
 
-        return self.next_player, self.board, valid_moves
+        return self.next_player, self.board, valid_moves, winner
 
     def flip_disks(self, row, col, player):
         """Flips the disks in all valid directions from (row, col) for the player."""
@@ -193,3 +208,58 @@ class OthelloBoard:
 
     def copy(self):
         return copy.deepcopy(self)
+
+    def check_winner(self):
+        black_count = np.sum(self.board == 0)
+        white_count = np.sum(self.board == 1)
+
+        if black_count > white_count:
+            return -1
+        elif white_count > black_count:
+            return -2
+        else:
+            return -3
+
+    def simulate_flip_count(self, position, player):
+        """
+        Simulates the move to count the number of stones that would be flipped without modifying the board.
+
+        Parameters:
+            position: Tuple (row, col) indicating the position of the move.
+            player: The player making the move (0 for Black, 1 for White).
+
+        Returns:
+            int: The number of stones that would be flipped by this move.
+        """
+        row, col = position
+        opponent = 1 if player == 0 else 0
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+        flip_count = 0
+
+        for dr, dc in directions:
+            r, c = row + dr, col + dc
+            temp_flip_count = 0
+            while 0 <= r < self.rows and 0 <= c < self.cols:
+                if self.board[r, c] == opponent:
+                    temp_flip_count += 1
+                elif self.board[r, c] == player:
+                    flip_count += temp_flip_count
+                    break
+                else:
+                    break
+                r += dr
+                c += dc
+
+        return flip_count
+
+    def is_incomplete(self):
+        """
+        Checks if there are any empty spots on the board where no stones are placed.
+
+        Returns:
+            bool: True if there are empty spots, False otherwise.
+        """
+        for row in self.board:
+            if -1 in row:
+                return True
+        return False
