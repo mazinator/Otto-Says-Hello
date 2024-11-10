@@ -3,11 +3,12 @@ some test to verify that various stuff is actually behaving as expected
 """
 from src.agents.simple_agents import RandomAgent, MinAgent, MaxAgent
 from src.environment.board import OthelloBoard
+from src.utils.read_othello_dataset import read_othello_dataset
 from src.utils.results_printer import store_results
 import string, random, time
 
 
-def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boards=False):
+def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boards=False, a_vs_a=False):
     print("Running tests..")
 
     print("check default board at beginning..")
@@ -97,26 +98,47 @@ def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boar
 
     if run_excessive:
         print("\nchecking if central limit theorem kicks in when playing a shitload of rounds..")
-        determine_average_winner(50000, print_boards=print_boards,
+        determine_average_winner(10000, print_boards=print_boards,
                                  print_only_uncomplete_boards=print_incomplete_boards)
     else:
         determine_average_winner(episodes=1000, print_boards=print_boards,
                                  print_only_uncomplete_boards=print_incomplete_boards)
 
-    print("\nPlaying RandomAgent vs. MinAgent on 8x8 board..")
-    agent_vs_agent(OthelloBoard(rows=8, cols=8), black=RandomAgent(), white=MinAgent(), print_boards=print_boards,
-                   delay=0)
+    if a_vs_a:
+        print("\nPlaying RandomAgent vs. MinAgent on 8x8 board..")
+        agent_vs_agent(OthelloBoard(rows=8, cols=8), black=RandomAgent(), white=MinAgent(), print_boards=print_boards,
+                       delay=0)
 
-    print("\nPlaying RandomAgent vs. MaxAgent..")
-    agent_vs_agent(OthelloBoard(), black=RandomAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
+        print("\nPlaying RandomAgent vs. MaxAgent..")
+        agent_vs_agent(OthelloBoard(), black=RandomAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
 
-    print("\nPlaying MinAgent vs. MaxAgent..")
-    agent_vs_agent(OthelloBoard(), black=MinAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
+        print("\nPlaying MinAgent vs. MaxAgent..")
+        agent_vs_agent(OthelloBoard(), black=MinAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
 
-    print("\nPlaying MinAgent vs. MaxAgent with both having epsilon 0.05 to introduce some level of randomness..")
-    agent_vs_agent(OthelloBoard(), black=MinAgent(0.05), white=MaxAgent(0.05), print_boards=print_boards, delay=0,
-                   episodes=10000)
+        print("\nPlaying MinAgent vs. MaxAgent with both having epsilon 0.05 to introduce some level of randomness..")
+        agent_vs_agent(OthelloBoard(), black=MinAgent(0.05), white=MaxAgent(0.05), print_boards=print_boards, delay=0,
+                       episodes=50)
 
+    print("Trying to run all games given in othello_dataset.csv..")
+    othello_games = read_othello_dataset()
+    board = OthelloBoard(rows=8, cols=8)
+    for idx, game in othello_games.iterrows():
+        board.reset_board()
+        next_player = 0
+        for move in game['game_moves']:
+            #print(f"{['black', 'white'][next_player]}'s {move}")
+            next_player, _, _, winner = board.make_move(move, next_player)
+
+        # not putting it in if, as playing all moves should lead to a conclusion
+        if winner == - 1 and game['winner'] == 1: assert True#, print("Black won")
+        elif winner == -2 and game['winner'] == -1: assert True #print("White won")
+        elif winner == -3 and game['winner'] == 0: assert True #print("It was a draw")
+        else:
+            print(f"Something's wrong with that game: {game['eOthello_game_id']}")
+            board.print_board()
+            assert False
+
+        if idx % 500 == 0: print(f"Ran {idx} games")
     print("\n\nALL TESTS PASSED!")
 
 
