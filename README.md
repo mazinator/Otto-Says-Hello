@@ -45,7 +45,7 @@ However, three different approaches will be implemented:
 ## Intended work-packages
 
 - Read through papers above to fully grasp state-of-the-art-approaches (10h)
-- Set up infrastructure (15h). DONE: Simple Board-class, printing in the console and test to validate correctness took around 5h.
+- Set up infrastructure (15h). DONE: Simple Board-class, printing in the console and test to validate correctness took around 10h.
 - Implement SOFA (Q-learning) (15h)
 - Implement the approaches mentioned above (10h each)
 - Finetune Neural Net, try out different architectures (35h)
