@@ -1,5 +1,5 @@
 from src.test.test import *
-from src.utils.read_othello_dataset import *
+from src.utils.data_loader import *
 import argparse
 
 

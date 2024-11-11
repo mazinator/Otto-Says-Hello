@@ -1,6 +1,10 @@
-import csv, os, json
+"""
+used when agent vs. agent is played. Results + metadata stored continuously in the file for a later analysis
+"""
 
-OUT_FILE = "../../out/results.csv"
+import csv, os
+
+OUT_FILE = "../../out/agent_vs_agent_results.csv"
 
 
 def store_results(black_wins, white_wins, draws, episodes, black_agent, white_agent, out_file=OUT_FILE):

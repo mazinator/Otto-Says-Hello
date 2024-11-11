@@ -3,8 +3,8 @@ some test to verify that various stuff is actually behaving as expected
 """
 from src.agents.simple_agents import RandomAgent, MinAgent, MaxAgent
 from src.environment.board import OthelloBoard
-from src.utils.read_othello_dataset import read_othello_dataset
-from src.utils.results_printer import store_results
+from src.utils.data_loader import read_othello_dataset
+from src.utils.results_writer import store_results
 import string, random, time
 
 

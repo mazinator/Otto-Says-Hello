@@ -136,7 +136,7 @@ class OthelloBoard:
 
         # Check if it is initial board state, if yes black MUST play
         if player is not self.next_player:
-            player_name = "Black" if player == 0 else "White"
+            player_name = "Black" if self.next_player == 0 else "White"
             raise ValueError(f"It's {player_name}'s turn!")
 
         if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
