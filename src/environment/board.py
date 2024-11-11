@@ -20,6 +20,12 @@ A small recap of the rules:
 5. All disks that can be flipped, have to be flipped
 6. When it is no longer possible for either player to move, the game is over. Disks are
     counted and the player with the majority of their color showing is the winner.
+
+Two common variants are not implemented:
+- Anti (player with least disks wins)
+- Hexa (e.g. Octoboard)
+While it is possible to define random openings by tweaking the init-param first_player, this is only used
+for testing purposes. Any agent besides simple_agents will not learn a random opening.
 """
 
 import numpy as np

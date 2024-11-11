@@ -1,6 +1,6 @@
 """
 This file implements some very stupid agents, they were mostly used for testing purposes and to have
-some feedback for the not-so-simple baselines, like simple Q-Learning without any neural network addition.
+some feedback for the medium agents, like simple Q-Learning without any neural network addition.
 """
 
 import random
