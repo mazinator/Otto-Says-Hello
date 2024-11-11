@@ -9,7 +9,7 @@ import random
 class RandomAgent:
 
     def get_action(self, board, player):
-        return random.choice(board.get_valid_moves(player=player))
+        return random.choice(board.get_valid_actions(player=player))
 
 
 class MinAgent:
@@ -21,7 +21,7 @@ class MinAgent:
         the min_agent always chooses the action which leads to the least stones flipped
         """
 
-        valid_moves = board.get_valid_moves(player)
+        valid_moves = board.get_valid_actions(player)
 
         if not valid_moves:
             assert False, "this function should not have been called if this agent has no moves"
@@ -50,7 +50,7 @@ class MaxAgent:
         the max_agent always chooses the action which leads to the least stones flipped
         """
 
-        valid_moves = board.get_valid_moves(player)
+        valid_moves = board.get_valid_actions(player)
 
         if not valid_moves:
             assert False, "this function should not have been called if this agent has no moves"

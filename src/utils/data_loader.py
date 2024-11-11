@@ -11,9 +11,13 @@ enough. Having a few more rounds makes the Kraut not fatter.
 """
 
 import pandas as pd
+import json
+
+from src.agents.medium_agents import SimpleQLearningAgent
+
 
 OTHELLO_DATASET = "../../data/othello_dataset.csv"
-
+PATH_SIMPLE_Q_LEARNER = "../../models/simple_q_learner.json"
 
 def read_othello_dataset(path=OTHELLO_DATASET):
     othello_data = pd.read_csv(path)
@@ -45,3 +49,55 @@ def extract_moves_from_stream(moves_stream: str):
             raise ValueError(f"Invalid format found at row {i}: {move}")
 
     return moves
+
+
+def store_q_agent(q_agent, filename=PATH_SIMPLE_Q_LEARNER):
+    """
+    Store the Q-learning agent's Q-table and parameters to a file.
+
+    Args:
+        q_agent (SimpleQLearningAgent): The Q-learning agent instance to store.
+        filename (str): The filename where data will be stored.
+    """
+    # Prepare the data to be saved
+    data = {
+        "learning_rate": q_agent.learning_rate,
+        "discount_factor": q_agent.discount_factor,
+        "epsilon": q_agent.epsilon,
+        "q_table": {str(k): v for k, v in q_agent.q_table.items()}
+    }
+
+    # Write the data to a JSON file
+    with open(filename, "w") as file:
+        json.dump(data, file, indent=4)
+    print(f"Agent data stored in {filename}")
+
+
+def load_q_agent(board, filename=PATH_SIMPLE_Q_LEARNER):
+    """
+    Load the Q-learning agent's Q-table and parameters from a file.
+
+    Args:
+        board: The board object the agent will use (needs to be provided on load).
+        filename (str): The filename from which to load the agent data.
+
+    Returns:
+        SimpleQLearningAgent: A new instance of SimpleQLearningAgent with loaded parameters and Q-table.
+    """
+    # Load the data from the JSON file
+    with open(filename, "r") as file:
+        data = json.load(file)
+
+    # Create a new agent with the loaded parameters
+    q_agent = SimpleQLearningAgent(
+        board=board,
+        learning_rate=data["learning_rate"],
+        discount_factor=data["discount_factor"],
+        epsilon=data["epsilon"]
+    )
+
+    # Reconstruct the Q-table, converting keys back to tuples
+    q_agent.q_table = {eval(k): v for k, v in data["q_table"].items()}
+
+    print(f"Agent data loaded from {filename}")
+    return q_agent

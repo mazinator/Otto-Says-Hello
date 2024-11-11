@@ -11,14 +11,14 @@ Each position on the board can have 3 different states:
 1: white disk
 
 A small recap of the rules:
-1. Black always moves first
+1. Black always acts first
 2. If a player cannot outflank and flip at least one opposing disk,
-    the opponent moves again. If a move is available, a player has
+    the opponent acts again. If an action is available, a player has
     to play.
 3. In simple language, you can flip disks horizontally/vertically/diagonally.
 4. Players may not skip over their own color disk(s) to outflank an opposing disk.
 5. All disks that can be flipped, have to be flipped
-6. When it is no longer possible for either player to move, the game is over. Disks are
+6. When it is no longer possible for either player to act, the game is over. Disks are
     counted and the player with the majority of their color showing is the winner.
 
 Two common variants are not implemented:
@@ -91,9 +91,9 @@ class OthelloBoard:
             row_content = "  ".join(symbols[self.board[row, col]] for col in range(self.cols))
             print(row_label + row_content)
 
-    def move_is_flipping_disks(self, row, col, player):
+    def action_is_flipping_disks(self, row, col, player):
         """
-        Checks if placing a disk at (row, col) is a flipping move for the player, which it has to do by the rules.
+        Checks if placing a disk at (row, col) is a flipping action for the player, which it has to do by the rules.
         """
 
         # Ensure the position is empty
@@ -113,7 +113,7 @@ class OthelloBoard:
                     found_opponent = True
                 elif self.board[r, c] == player:
                     if found_opponent:
-                        return True  # Valid move as it can flip opponent's disks
+                        return True  # Valid action as it can flip opponent's disks
                     else:
                         break
                 else:
@@ -123,12 +123,12 @@ class OthelloBoard:
 
         return False  # No direction had a valid flip; return False
 
-    def make_move(self, position, player):
+    def make_action(self, position, player):
         """
-        Makes a move for the player if it's valid, placing a disk and flipping appropriate disks.
+        Makes an action for the player if it's valid, placing a disk and flipping appropriate disks.
 
         Returns:
-            next_player, board, valid_moves, winner
+            next_player, board, valid_actions, winner
         """
 
         # Try decoding the given position, can be either e.g. A1 or (0,0)
@@ -151,41 +151,41 @@ class OthelloBoard:
             player_name = "Black" if self.next_player == 0 else "White"
             raise ValueError(f"It's {player_name}'s turn!")
 
-        # Check if move is inside the boundaries
+        # Check if desired action is inside the boundaries
         if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
-            raise ValueError("Move is out of bounds.")
+            raise ValueError("Action is out of bounds.")
 
-        # A move has to flip at least 1 disk
-        if not self.move_is_flipping_disks(row_idx, col_idx, player):
-            raise ValueError("Invalid move.")
+        # A action has to flip at least 1 disk
+        if not self.action_is_flipping_disks(row_idx, col_idx, player):
+            raise ValueError("Invalid action.")
 
         self.board[row_idx, col_idx] = player
         self.flip_disks(row_idx, col_idx, player)
 
-        # Check if the other player can make a move, otherwise return same player
+        # Check if the other player can make an action, otherwise return same player
         otherPlayer = 1 if player == 0 else 0
         winner = 0  # only changed below if game's finished. Winner = 0 means that no one won, see check_winner()
 
-        otherPlayer_valid_moves = self.get_valid_moves(otherPlayer)
-        player_valid_moves = self.get_valid_moves(player)
+        otherPlayer_valid_actions = self.get_valid_actions(otherPlayer)
+        player_valid_actions = self.get_valid_actions(player)
 
-        # Game is over, no more moves possible
-        if len(otherPlayer_valid_moves) == 0 and len(player_valid_moves) == 0:
+        # Game is over, no more actions possible
+        if len(otherPlayer_valid_actions) == 0 and len(player_valid_actions) == 0:
             winner = self.check_winner()
-            valid_moves = []
+            valid_actions = []
 
         else:
 
-            # If the other player has moves, they play next; otherwise, same player goes again
-            if len(otherPlayer_valid_moves) > 0:
-                valid_moves = otherPlayer_valid_moves
+            # If the other player has actions, they play next; otherwise, same player goes again
+            if len(otherPlayer_valid_actions) > 0:
+                valid_actions = otherPlayer_valid_actions
                 self.next_player = otherPlayer
 
             else:
-                valid_moves = player_valid_moves
+                valid_actions = player_valid_actions
                 self.next_player = player
 
-        return self.next_player, self.board, valid_moves, winner
+        return self.next_player, self.board, valid_actions, winner
 
     def flip_disks(self, row, col, player):
         """
@@ -210,21 +210,21 @@ class OthelloBoard:
                 r += dr
                 c += dc
 
-    def get_valid_moves(self, player):
+    def get_valid_actions(self, player):
         """
-        Returns a list of valid moves for the given player.
-        Each move is represented as a tuple (row, col).
+        Returns a list of valid actions for the given player.
+        Each action is represented as a tuple (row, col).
 
         player: 0 for black, 1 for white
         """
-        valid_moves = []
+        valid_actions = []
 
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.board[row, col] == -1 and self.move_is_flipping_disks(row, col, player):
-                    valid_moves.append((row, col))
+                if self.board[row, col] == -1 and self.action_is_flipping_disks(row, col, player):
+                    valid_actions.append((row, col))
 
-        return valid_moves
+        return valid_actions
 
     def copy(self):
         return copy.deepcopy(self)
@@ -242,9 +242,9 @@ class OthelloBoard:
 
     def simulate_flip_count(self, position, player):
         """
-        Simulates the move to count the number of stones that would be flipped without modifying the board.
+        Simulates the action to count the number of stones that would be flipped without modifying the board.
 
-        Returns The number of stones that would be flipped by this move.
+        Returns The number of stones that would be flipped by this action.
         """
         row, col = position
         opponent = 1 if player == 0 else 0

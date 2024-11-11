@@ -68,3 +68,8 @@ für den gegner entstehen
 - szenarien/konkrete wichtige spielsituationen irgendwie spezifischer ins training einbauen?
 
 WICHTIG: https://github.com/2Bear/othello-zero
+
+Erkenntnisse:
+
+- MinAgent vs MaxAgent:
+  - Beginner ist derjenige, der nicht beginnt! Immer.
