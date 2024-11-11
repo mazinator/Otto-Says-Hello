@@ -1,3 +1,8 @@
+"""
+This file implements some very stupid agents, they were mostly used for testing purposes and to have
+some feedback for the not-so-simple baselines, like simple Q-Learning without any neural network addition.
+"""
+
 import random
 
 
@@ -19,13 +24,11 @@ class MinAgent:
         valid_moves = board.get_valid_moves(player)
 
         if not valid_moves:
-            return None  # No valid moves available
+            assert False, "this function should not have been called if this agent has no moves"
 
-        # With epsilon probability, pick a random move for exploration
         if random.random() < self.epsilon:
             return random.choice(valid_moves)
 
-        # Find the move with the minimum flips
         min_flips = float('inf')
         best_move = None
 
@@ -44,19 +47,17 @@ class MaxAgent:
 
     def get_action(self, board, player):
         """
-        the min_agent always chooses the action which leads to the least stones flipped
+        the max_agent always chooses the action which leads to the least stones flipped
         """
 
         valid_moves = board.get_valid_moves(player)
 
         if not valid_moves:
-            return None  # No valid moves available
+            assert False, "this function should not have been called if this agent has no moves"
 
-        # With epsilon probability, pick a random move for exploration
         if random.random() < self.epsilon:
             return random.choice(valid_moves)
 
-        # Find the move with the minimum flips
         max_flips = float('-inf')
         best_move = None
 

@@ -31,7 +31,7 @@ class OthelloBoard:
         """
         In order to always have a "middle" to set the first 4 stones,
         the restrictions on those params have been chosen as:
-        1. at least 6x6
+        1. at least 6x6, at most 26x26 (mostly because of the alphabet and it's already more than enough)
         2. even numbers
         """
         self.board = None
@@ -64,12 +64,14 @@ class OthelloBoard:
         self.next_player = self.first_player_original
 
     def is_initial_state(self):
-        """Check if the board is in the initial state."""
+        """
+        Check if the board is in the initial state.
+        """
         return np.array_equal(self.board, self.initial_board)
 
     def print_board(self):
         """
-        Prints the board with A-H column labels and 1-8 (or more) row labels, with consistent spacing.
+        Prints the board with letter column labels and digit row labels.
         """
         symbols = {-1: '-', 0: 'B', 1: 'W'}
 
@@ -83,11 +85,14 @@ class OthelloBoard:
             row_content = "  ".join(symbols[self.board[row, col]] for col in range(self.cols))
             print(row_label + row_content)
 
-    def is_valid_move(self, row, col, player):
-        """Checks if placing a disk at (row, col) is a valid move for the player."""
-        # Ensure the position is empty; if not, return False immediately
+    def move_is_flipping_disks(self, row, col, player):
+        """
+        Checks if placing a disk at (row, col) is a flipping move for the player, which it has to do by the rules.
+        """
+
+        # Ensure the position is empty
         if self.board[row, col] != -1:
-            return False  # Position is not empty
+            raise ValueError("Position is not empty!")
 
         # Define opponent and directions for checking
         opponent = 1 if player == 0 else 0
@@ -117,52 +122,59 @@ class OthelloBoard:
         Makes a move for the player if it's valid, placing a disk and flipping appropriate disks.
 
         Returns:
-            player who makes the next move (same player, if other player cannot do a move)
+            next_player, board, valid_moves, winner
         """
+
+        # Try decoding the given position, can be either e.g. A1 or (0,0)
         try:
             if isinstance(position, tuple) and len(position) == 2 and all(isinstance(i, int) for i in position):
                 # Position is given as (row, col) with 0-based indexing
                 row_idx, col_idx = position
             elif isinstance(position, str) and len(position) >= 2:
-                # Position is given as a string like 'B5'
+                # Position is given as a string like 'A1'
                 col, row = position[0], position[1:]
                 col_idx = ord(col.upper()) - ord('A')
                 row_idx = int(row) - 1
             else:
-                raise ValueError("Invalid input format. Use 'B5' or (1, 4) with 0-based indexing.")
+                raise ValueError("Invalid input format. Use 'A1' or (0,0) with 0-based indexing.")
         except (IndexError, ValueError):
-            print("Invalid input format. Use format like 'B5' or (1, 4) with 0-based indexing.")
-            return False
+            raise ValueError("Invalid input format. Use format like 'A1' or (0,0) with 0-based indexing.")
 
-        # Check if it is initial board state, if yes black MUST play
+        # Check if correct player is indeed playing
         if player is not self.next_player:
             player_name = "Black" if self.next_player == 0 else "White"
             raise ValueError(f"It's {player_name}'s turn!")
 
+        # Check if move is inside the boundaries
         if not (0 <= col_idx < self.cols and 0 <= row_idx < self.rows):
             raise ValueError("Move is out of bounds.")
 
-        if not self.is_valid_move(row_idx, col_idx, player):
+        # A move has to flip at least 1 disk
+        if not self.move_is_flipping_disks(row_idx, col_idx, player):
             raise ValueError("Invalid move.")
 
         self.board[row_idx, col_idx] = player
         self.flip_disks(row_idx, col_idx, player)
 
-        # Check if other player can make a move, otherwise return same player
+        # Check if the other player can make a move, otherwise return same player
         otherPlayer = 1 if player == 0 else 0
-        winner = 0  # only changed below if game's finished
+        winner = 0  # only changed below if game's finished. Winner = 0 means that no one won, see check_winner()
 
         otherPlayer_valid_moves = self.get_valid_moves(otherPlayer)
         player_valid_moves = self.get_valid_moves(player)
 
+        # Game is over, no more moves possible
         if len(otherPlayer_valid_moves) == 0 and len(player_valid_moves) == 0:
             winner = self.check_winner()
             valid_moves = []
+
         else:
+
             # If the other player has moves, they play next; otherwise, same player goes again
             if len(otherPlayer_valid_moves) > 0:
                 valid_moves = otherPlayer_valid_moves
                 self.next_player = otherPlayer
+
             else:
                 valid_moves = player_valid_moves
                 self.next_player = player
@@ -170,7 +182,9 @@ class OthelloBoard:
         return self.next_player, self.board, valid_moves, winner
 
     def flip_disks(self, row, col, player):
-        """Flips the disks in all valid directions from (row, col) for the player."""
+        """
+        Flips the disks in all valid directions from (row, col) for the player.
+        """
 
         opponent = 1 if player == 0 else 0
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
@@ -201,7 +215,7 @@ class OthelloBoard:
 
         for row in range(self.rows):
             for col in range(self.cols):
-                if self.board[row, col] == -1 and self.is_valid_move(row, col, player):
+                if self.board[row, col] == -1 and self.move_is_flipping_disks(row, col, player):
                     valid_moves.append((row, col))
 
         return valid_moves
@@ -224,12 +238,7 @@ class OthelloBoard:
         """
         Simulates the move to count the number of stones that would be flipped without modifying the board.
 
-        Parameters:
-            position: Tuple (row, col) indicating the position of the move.
-            player: The player making the move (0 for Black, 1 for White).
-
-        Returns:
-            int: The number of stones that would be flipped by this move.
+        Returns The number of stones that would be flipped by this move.
         """
         row, col = position
         opponent = 1 if player == 0 else 0

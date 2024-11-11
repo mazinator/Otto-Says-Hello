@@ -1,5 +1,34 @@
 """
-some test to verify that various stuff is actually behaving as expected
+test file to verify that various stuff is actually behaving as expected.
+Tests are available for all reasonable aspects:
+- wrong parameters when creating a board, e.g. size
+- checking on valid/invalid moves
+- check if winner is correctly determined by making use of the CLT (ratio of black wins tends towards 0.5) in
+  combination with random agents. It can be argued that directly checking winners is also an option, however
+  there's only so much games one can check manually (and still having some uncertainty). I therefore claim that
+  a combined approach (checking some valid/invalid moves and winners manually, while also assuming that randomly
+  played games with alternating beginners (white/black) has to lead to a black-winner-ratio of 0.5, excluding draws.
+- some further validation by playing a MaxAgent (flip as much disks as possible) vs a MinAgent (vice versa). I expect
+  the MinAgent to always loose, which is the case.
+- The human-played games are read in, played through completely, and it is checked if the winner is as stated by
+  the given 'observation'. All moves are valid, because otherwise there would be an error raised by the board-file
+
+There are some further parameters in the 'main' function, aka run_all_tests:
+- run_excessive: If True, drastically increases number of epsisode on a few spots to verify that the CLT kicks in
+- print_incomplete_boards: Used to identify board where not all fields have a disk placed, because no player is
+  able to make a move anymore. I could not think of any reasonable method to verify that such a early termination
+  is indeed correct without using code from the board, which again would be error-prone itself potentiall if there
+  was any error. I looked at around 200 incomplete boards and verified myself that all of them have been correctly
+  terminated.
+- print_boards: prints all board states apparent in the tests below. Useful if there is a test is failing
+- a_vs_a: If True, lets a lot of agents play against each other.
+
+IMPORTANT: Set run_excessive and a_vs_a to True and run the file to verify that the environment + the data is working
+fine! Setting those parameters to True means the file takes around an hour of running.
+
+With this file running smoothly, I conclude that Í did my best to verify that there are no potential logic or
+implementation errors anywhere in the code, except any agent that is not in simple_agents.py
+
 """
 from src.agents.simple_agents import RandomAgent, MinAgent, MaxAgent
 from src.environment.board import OthelloBoard
@@ -8,7 +37,7 @@ from src.utils.results_writer import store_results
 import string, random, time
 
 
-def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boards=False, a_vs_a=False):
+def run_all_tests(run_excessive=True, print_incomplete_boards=False, print_boards=False, a_vs_a=True):
     print("Running tests..")
 
     print("check default board at beginning..")
@@ -99,10 +128,10 @@ def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boar
     if run_excessive:
         print("\nchecking if central limit theorem kicks in when playing a shitload of rounds..")
         determine_average_winner(10000, print_boards=print_boards,
-                                 print_only_uncomplete_boards=print_incomplete_boards)
+                                 print_only_incomplete_boards=print_incomplete_boards)
     else:
         determine_average_winner(episodes=1000, print_boards=print_boards,
-                                 print_only_uncomplete_boards=print_incomplete_boards)
+                                 print_only_incomplete_boards=print_incomplete_boards)
 
     if a_vs_a:
         print("\nPlaying RandomAgent vs. MinAgent on 8x8 board..")
@@ -113,7 +142,8 @@ def run_all_tests(run_excessive=False, print_incomplete_boards=False, print_boar
         agent_vs_agent(OthelloBoard(), black=RandomAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
 
         print("\nPlaying MinAgent vs. MaxAgent..")
-        agent_vs_agent(OthelloBoard(), black=MinAgent(), white=MaxAgent(), print_boards=print_boards, delay=0)
+        agent_vs_agent(OthelloBoard(), black=MinAgent(), white=MaxAgent(), print_boards=print_boards, delay=0,
+                       episodes=50)
 
         print("\nPlaying MinAgent vs. MaxAgent with both having epsilon 0.05 to introduce some level of randomness..")
         agent_vs_agent(OthelloBoard(), black=MinAgent(0.05), white=MaxAgent(0.05), print_boards=print_boards, delay=0,
@@ -211,6 +241,9 @@ def agent_vs_agent(board, black, white, print_boards=False, episodes=50, delay=0
 
 
 def try_invalid_move(board, move, player):
+    """
+    makes an invalid move in a given board state, fails if such a move is possible
+    """
     try:
         board.make_move(move, player)
         assert False, print(f"Move {move} is NOT valid")
@@ -219,6 +252,9 @@ def try_invalid_move(board, move, player):
 
 
 def try_valid_move(board, move, player):
+    """
+    makes a valid move in a given board state, fails if the move is not possible
+    """
     try:
         board.make_move(move, player)
         print(f"Test passed, move {move} is valid")
@@ -227,6 +263,9 @@ def try_valid_move(board, move, player):
 
 
 def try_bad_board_config(col, row):
+    """
+    gets an invalid row/col combination, fails if such a board can be created.
+    """
     try:
         boardNok = OthelloBoard(cols=col, rows=row)
         assert False, print(f"board with col={col}, row={row} should NOT be possible")
@@ -235,6 +274,9 @@ def try_bad_board_config(col, row):
 
 
 def try_good_board_config(col, row):
+    """
+    gets a valid row/col combination, fails if such a board can NOT be created.
+    """
     try:
         boardOk = OthelloBoard(cols=col, rows=row)
         print("Test passed")
@@ -242,7 +284,11 @@ def try_good_board_config(col, row):
         assert False, print(f"board with col={col}, row={row} should be possible")
 
 
-def determine_average_winner(episodes=1000, rows=6, cols=6, print_boards=False, print_only_uncomplete_boards=False):
+def determine_average_winner(episodes=1000, rows=6, cols=6, print_boards=False, print_only_incomplete_boards=False):
+    """
+    Used to verify that the CLT indeed kicks in, however only lets the test fail if at least 10.0000 rounds have
+    been played to make sure that indeed the CLT should have kicked in.
+    """
     print("using alternating beginner (black/white) to remove issues from who starts in random games..")
     white_wins = 0
     black_wins = 0
@@ -251,7 +297,7 @@ def determine_average_winner(episodes=1000, rows=6, cols=6, print_boards=False, 
         if i % 5000 == 0:
             print(f"Episode {i} in CLT checker of {episodes}")
         res = play_random_game(rows, cols, print_boards, current_player=0 if i % 2 == 0 else 1,
-                               print_only_incomplete_boards=print_only_uncomplete_boards)
+                               print_only_incomplete_boards=print_only_incomplete_boards)
 
         if res == -1:
             black_wins += 1
@@ -269,7 +315,7 @@ def determine_average_winner(episodes=1000, rows=6, cols=6, print_boards=False, 
 
 def play_random_game(cols=6, rows=6, print_board=False, current_player=0, print_only_incomplete_boards=False):
     """
-    returns the winner
+    returns the winner of a random game
     """
 
     board = OthelloBoard(rows=rows, cols=cols, first_player=current_player)
