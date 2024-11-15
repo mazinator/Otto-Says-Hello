@@ -72,4 +72,4 @@ WICHTIG: https://github.com/2Bear/othello-zero
 Erkenntnisse:
 
 - MinAgent vs MaxAgent:
-  - Beginner ist derjenige, der nicht beginnt! Immer.
+  - Gewinner ist derjenige, der nicht beginnt! Immer. whut
