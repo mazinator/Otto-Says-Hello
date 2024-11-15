@@ -30,6 +30,7 @@ The following papers seem as an interesting starting point into this subject:
 - [Deep reinforcement Learning Using Monte-Carlo Tree Search for Hex and Othello](https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/2777474).
 - [Hierarchical Reinforcement Learning for the Game of Othello](https://ir.canterbury.ac.nz/bitstreams/51750833-63c1-42a6-b7bf-08ecd4c58434/download)
 - [Q-learning adaptations in the game Othello](https://fse.studenttheses.ub.rug.nl/id/eprint/23027)
+- [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/pdf/1509.06461)
 
 Another interesting link on this topic:
 - [GymOthelloEnv](https://github.com/lerrytang/GymOthelloEnv)
