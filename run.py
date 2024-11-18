@@ -8,7 +8,7 @@ def main(run_tests=False):
 
     # run tests at the beginning if desired
     if run_tests:
-        run_all_tests()
+        run_board_correctness_tests()
 
     #othello_games = read_othello_dataset()
     #print(othello_games)

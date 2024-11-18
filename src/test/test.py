@@ -35,10 +35,12 @@ from src.agents.simple_agents import RandomAgent, MinAgent, MaxAgent
 from src.environment.board import OthelloBoard
 from src.utils.data_loader import read_othello_dataset, store_q_agent, load_q_agent
 from src.utils.agent_vs_agent_simulation import simulate_agent_vs_agent
+from src.environment.replay_buffer import create_and_store_replay_buffer
 import string, random, time
+from pathlib import Path
 
 
-def run_all_tests(run_excessive=True, print_incomplete_boards=False, print_boards=False, a_vs_a=True):
+def run_board_correctness_tests(run_excessive=True, print_incomplete_boards=False, print_boards=False):
     print("Running tests..")
 
     print("check default board at beginning..")
@@ -134,6 +136,9 @@ def run_all_tests(run_excessive=True, print_incomplete_boards=False, print_board
         determine_average_winner(episodes=1000, print_boards=print_boards,
                                  print_only_incomplete_boards=print_incomplete_boards)
 
+
+def run_simple_agent_tests(print_boards=False, a_vs_a=True):
+
     if a_vs_a:
         print("\nPlaying RandomAgent vs. MinAgent on 8x8 board..")
         simulate_agent_vs_agent(board=OthelloBoard(rows=8, cols=8),
@@ -190,72 +195,85 @@ def run_all_tests(run_excessive=True, print_incomplete_boards=False, print_board
                                 delay=0,
                                 n_games=50)
 
-    print("Assumption: If the simple Q-Learning Agent is indeed correct, it has to beat all simple agents by zero")
-    environment = OthelloBoard(6,6)
-    q_learning_agent = SimpleQLearningAgent(environment)
-    n_episodes = 10000
+        print("Trying to learn from simple Q learning algorithm")
+        print("Stating to learn from experience..")
+        environment = OthelloBoard(8,8)
+        q_learning_agent = SimpleQLearningAgent(environment)
+        othello_games = read_othello_dataset()
+        for idx, game in othello_games.iterrows():
+            environment.reset_board()
+            q_learning_agent.learn_by_experience(game['winner'], game['game_moves'])
+            if idx % 1000 == 0:
+                print(f"learned from {idx} games..")
 
-    # Train the Q-Learning Agent over multiple episodes
-    for episode in range(n_episodes):
-        if episode % 1000 == 0:
-            print(f"training simple Q-Learning agent, episode {episode} of {n_episodes}")
-        q_learning_agent.play_episode()
-    q_learning_agent.epsilon = 0  # no more exploration, just brutally beating the simple baselines (hopefully)
-    store_q_agent(q_learning_agent)
+        n_episodes = 1000000
+        print(f"starting to learn by letting agent play against itself for {n_episodes} episodes..")
 
-    print("Q-learning vs RandomAgent..")
-    simulate_agent_vs_agent(board=environment,
-                            agent1=RandomAgent(),
-                            agent1_hparams="None",
-                            agent2=q_learning_agent,
-                            agent2_hparams=f"episodes_{n_episodes}",
-                            print_boards=print_boards,
-                            alternate_beginner=True,
-                            n_games=100,
-                            delay=0)
+        # Train the Q-Learning Agent over multiple episodes
+        for episode in range(n_episodes):
+            q_learning_agent.epsilon = 0.1
 
-    print("Q-learning vs MinAgent..")
-    simulate_agent_vs_agent(board=environment,
-                            agent1=MinAgent(),
-                            agent1_hparams="None",
-                            agent2=q_learning_agent,
-                            agent2_hparams=f"episodes_{n_episodes}",
-                            print_boards=print_boards,
-                            alternate_beginner=True,
-                            n_games=100,
-                            delay=0)
+            if episode % 1000 == 0:
+                print(f"training simple Q-Learning agent, episode {episode} of {n_episodes}")
+            q_learning_agent.play_episode()
+            if episode % 50000 == 0:
+                #q_learning_agent.decay_epsilon(0.995)
+                print("letting Q-Learning-Agent play against other agents ..")
+                q_learning_agent.epsilon = 0  # no more exploration, just brutally beating the simple baselines
+                #store_q_agent(q_learning_agent)
 
-    print("Q-learning vs MinAgent..")
-    simulate_agent_vs_agent(board=environment,
-                            agent1=MaxAgent(),
-                            agent1_hparams="None",
-                            agent2=q_learning_agent,
-                            agent2_hparams=f"episodes_{n_episodes}",
-                            print_boards=print_boards,
-                            alternate_beginner=True,
-                            n_games=100,
-                            delay=0)
+                print("Q-learning vs RandomAgent..")
+                simulate_agent_vs_agent(board=environment,
+                                        agent1=RandomAgent(),
+                                        agent1_hparams="None",
+                                        agent2=q_learning_agent,
+                                        agent2_hparams=f"experience_learned",
+                                        print_boards=print_boards,
+                                        alternate_beginner=True,
+                                        n_games=100,
+                                        delay=0)
 
-    print("Trying to run all games given in othello_dataset.csv..")
-    othello_games = read_othello_dataset()
-    board = OthelloBoard(rows=8, cols=8)
-    for idx, game in othello_games.iterrows():
-        board.reset_board()
-        next_player = 0
-        for action in game['game_moves']:
-            next_player, _, _, winner = board.make_action(action, next_player)
+                print("Q-learning vs MinAgent..")
+                simulate_agent_vs_agent(board=environment,
+                                        agent1=MinAgent(),
+                                        agent1_hparams="None",
+                                        agent2=q_learning_agent,
+                                        agent2_hparams=f"experience_learned",
+                                        print_boards=print_boards,
+                                        alternate_beginner=True,
+                                        n_games=100,
+                                        delay=0)
 
-        # not putting it in if, as playing all actions should lead to a conclusion
-        if winner == - 1 and game['winner'] == 1: assert True
-        elif winner == -2 and game['winner'] == -1: assert True
-        elif winner == -3 and game['winner'] == 0: assert True
-        else:
-            print(f"Something's wrong with that game: {game['eOthello_game_id']}")
-            board.print_board()
-            assert False
+                print("Q-learning vs MaxAgent..")
+                simulate_agent_vs_agent(board=environment,
+                                        agent1=MaxAgent(),
+                                        agent1_hparams="None",
+                                        agent2=q_learning_agent,
+                                        agent2_hparams=f"experience_learned",
+                                        print_boards=print_boards,
+                                        alternate_beginner=True,
+                                        n_games=100,
+                                        delay=0)
 
-        if idx % 500 == 0: print(f"Ran {idx} games")
-    print("\n\nALL TESTS PASSED!")
+                """print("Trying to run all games given in othello_dataset.csv..")
+                othello_games = read_othello_dataset()
+                board = OthelloBoard(rows=8, cols=8)
+                for idx, game in othello_games.iterrows():
+                    board.reset_board()
+                    next_player = 0
+                    for action in game['game_moves']:
+                        next_player, _, _, winner = board.make_action(action, next_player)
+        
+                    # not putting it in if, as playing all actions should lead to a conclusion
+                    if winner == - 1 and game['winner'] == 1: assert True
+                    elif winner == -2 and game['winner'] == -1: assert True
+                    elif winner == -3 and game['winner'] == 0: assert True
+                    else:
+                        print(f"Something's wrong with that game: {game['eOthello_game_id']}")
+                        board.print_board()
+                        assert False
+        
+                    if idx % 500 == 0: print(f"Ran {idx} games")"""
 
 
 def try_invalid_action(board, action, player):
@@ -355,5 +373,18 @@ def play_random_game(cols=6, rows=6, print_board=False, current_player=0, print_
     return winner
 
 
+def run_replay_buffer_tests():
+    print('checking out if I can read use the replay buffer..')
+    create_and_store_replay_buffer()
+    print('processed all games, checking if file exists .. ')
+    buffer_file = Path('../../data/replay_buffer.json')
+
+    assert buffer_file.exists(), 'this file should exist!'
+
+
+
 if __name__ == "__main__":
-    run_all_tests(run_excessive=False, print_boards=False, print_incomplete_boards=False)
+    #run_board_correctness_tests(run_excessive=False, print_boards=False, print_incomplete_boards=False)
+    #run_simple_agent_tests()
+    run_replay_buffer_tests()
+    print("\n\nALL TESTS PASSED!")

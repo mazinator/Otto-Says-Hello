@@ -2,7 +2,7 @@
 used when agent vs. agent is played. Results + metadata stored continuously in the file for a later analysis
 """
 
-import csv, os
+import csv, os, time
 
 OUT_FILE = "../../out/agent_vs_agent_results.csv"
 
@@ -36,7 +36,7 @@ def store_results(agent1_wins,
     headers = ["Black Agent", "White Agent", "Episodes", "Black Wins", "White Wins", "Draws",
                "Agent1_description", "Agent2_description", "Alternating Starts"]
     row = [agent1_name, agent2_name, n_games, agent1_wins, agent2_wins, draws,
-           agent1_hparams, agent2_hparams, alternating_starts]
+           agent1_hparams, agent2_hparams, alternating_starts, time.time()]
 
     with open(out_file, mode='a' if file_exists else 'w', newline='') as file:
         writer = csv.writer(file)
