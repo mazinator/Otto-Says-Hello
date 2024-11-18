@@ -45,16 +45,40 @@ However, three different approaches will be implemented:
 
 ## Intended work-packages
 
-- Read through papers above to fully grasp state-of-the-art-approaches (10h)
-- Set up infrastructure (15h). DONE: Simple Board-class, printing in the console and test to validate correctness took around 10h.
+- Read through papers above to fully grasp state-of-the-art-approaches (originally intended: 10h. actually: idk I lost track of the time as watched also a lot of content on YouTube, so probably way more than 10 hours(
+- Set up infrastructure (originally intended: 15h. Actually: creating the board, a lot of tests and a few simple baseline agents took around 15 hours)
 - Implement SOFA (Q-learning) (15h)
 - Implement the approaches mentioned above (10h each)
 - Finetune Neural Net, try out different architectures (35h)
 - Using an existing application to showcase the results (5h)
 - Final report and presentation (5h)
 
+## Deliverables for Submission 2
 
-notes: 
+- Error Metric TODO gibts da überhaupt ah auswahl
+- establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
+- 
+
+## Interesting aspects arising during implementation (written for Submission 2)
+
+- I seem to have underestimated the level of computational power needed for training an Othello-bot even with limited resources. (18.11.2024)
+- I did loose some time while implementing the simple Q-learning agent, as I thought that the training was broken. However, after a little
+  more research, it seems that indeed even 2 full days of training is not enough for this Q-Agent to even consistenly beat the RandomAgent, while
+  loosing big time against the MaxAgent. (18.11.2024)
+- A very popular strategy in (standard) Othello is to perform moves at the beginning where not a lost of disks are flipped, as this limits the
+  number of moves the opponent can make. This probably leads to the player being able to flip a lot of disks at the end of the game. As I already
+  spent a lot of time and overnight-laptop-resources on this project, I did not loose time to directly implement such a strategy or even take
+  handcrafted features into consideration. (18.11.2024)
+- What I did however, was to implement two very simple agents: MinAgent (always choosing the move with the least disks flipped) and the MaxAgent (vice versa).
+  At least I personally was very convinced that the MaxAgent should beat the MinAgent all the time, which was also confirmed by my tests. However,
+  a fews after, I realized that the MaxAgent always won because the MinAgent started! This can maybe be somehow explained by the fact that always more or
+  less the same game is played with those two opponents, however it was still very unexpected. (18.11.2024)
+- Overall, I did have to make some decisions on which parts of the Othello-game to explore, as e.g. handcrafting features alone would have probably been enough to
+  fill this project. Naturally, I decided to focus on the 'Deep' part. (18.11.2024)
+
+## Remove before submission
+
+notes on important aspects of the Othello Game: 
 - auf versch. strategies trainieren: z.B. take as less / much pieces as possible
 - sweet 16? bleibt das game eher in der mitte?
 - äußerer Rand wird von mtte nach rand in B,A,C unterteilt.
@@ -67,10 +91,7 @@ für den gegner entstehen
 - change of strategies, zb mit minimizing starten und dann spätere
 'facts' reintrainieren?
 - szenarien/konkrete wichtige spielsituationen irgendwie spezifischer ins training einbauen?
-
 WICHTIG: https://github.com/2Bear/othello-zero
-
 Erkenntnisse:
-
 - MinAgent vs MaxAgent:
   - Gewinner ist derjenige, der nicht beginnt! Immer. whut
