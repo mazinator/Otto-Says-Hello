@@ -21,7 +21,7 @@ It can be concluded that the Othello game has the following properties / leads t
 4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly reduces the chance of winning)
 5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options I can think of for assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
-Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, later on a 10x10 or potentially even bigger configuration.
+Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, other configurations will be tryed out depending on the computational resources.
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
