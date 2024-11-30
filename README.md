@@ -95,3 +95,6 @@ WICHTIG: https://github.com/2Bear/othello-zero
 Erkenntnisse:
 - MinAgent vs MaxAgent:
   - Gewinner ist derjenige, der nicht beginnt! Immer. whut
+
+- mu zero macht keinen Sinn hier, da bei othello keine unkown oder partially observable dynamics vorhanden sind
+- 

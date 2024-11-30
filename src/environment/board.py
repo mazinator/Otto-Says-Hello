@@ -278,3 +278,28 @@ class OthelloBoard:
             if -1 in row:
                 return True
         return False
+
+    def __eq__(self, other):
+        if isinstance(other, OthelloBoard):
+            return np.array_equal(self.board, other.board) and self.next_player == other.next_player
+        return False
+
+    def __hash__(self):
+        # Create a tuple of the board state and next player for hashing
+        board_tuple = tuple(map(tuple, self.board))
+        return hash((board_tuple, self.next_player))
+
+    def get_board_state_key(self):
+        # Convert the board 2D array to a tuple of tuples to make it immutable and hashable
+        return (tuple(map(tuple, self.board)), self.next_player)
+
+    def stone_count(self):
+        """
+        Counts the number of stones for each player (black and white) on the board.
+
+        Returns:
+            dict: A dictionary with the keys 'black' and 'white' containing the respective counts.
+        """
+        black_count = np.sum(self.board == 0)
+        white_count = np.sum(self.board == 1)
+        return {'black': black_count, 'white': white_count}

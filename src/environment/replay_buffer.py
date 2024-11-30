@@ -23,7 +23,7 @@ from src.environment.board import OthelloBoard
 from src.utils.data_loader import read_othello_dataset
 from pathlib import Path
 
-OUT_FILE = '../../data/replay_buffer.json'
+OUT_FILE = 'data/replay_buffer.json'
 
 
 class ReplayBuffer:
@@ -139,3 +139,39 @@ def create_and_store_replay_buffer(output_file=OUT_FILE):
         json.dump(experiences, f)
 
     print(f"Saved {len(experiences)} experiences to {output_file}.")
+
+
+def load_replay_buffer(input_file=OUT_FILE, limit=float('inf')):
+    """
+    Load experiences from a JSON replay buffer file.
+
+    :param limit:
+    :param input_file: Path to the JSON file containing replay buffer data.
+
+    :returns: ReplayBuffer instance containing the loaded experiences.
+    """
+    replay_buffer = ReplayBuffer()
+
+    # Load experiences from the file
+    if Path(input_file).exists():
+        with open(input_file, 'r') as f:
+            experiences = json.load(f)
+
+        for idx, experience in enumerate(experiences):
+            if idx >= limit:
+                break
+
+            state = np.array(experience['state'])
+            action = tuple(experience['action'])
+            reward = experience['reward']
+            next_state = np.array(experience['next_state'])
+            done = experience['done']
+
+            # Add experience to replay buffer
+            replay_buffer.add(state, action, reward, next_state, done)
+
+        print(f"Loaded {len(replay_buffer)} experiences from {input_file}.")
+    else:
+        print(f"Input file {input_file} does not exist.")
+
+    return replay_buffer
