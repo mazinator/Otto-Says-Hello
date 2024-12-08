@@ -1,8 +1,10 @@
 # Otto-Says-Hello
 
 **Sarcasm and overconfidence: ON**
+
 Otto is an AI bot trained with deep reinforcement learning to destroy any hopes of ever beating him in Othello.
 **Sarcasm: OFF**
+
 After watching a few "how to beat everyone in Othello"-videos, the following seem to be the most important aspects for human players:
 
 * try to control the inner 4x4 matrix
