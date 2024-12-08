@@ -55,6 +55,39 @@ However, three different approaches will be implemented:
 
 ## Deliverables for Submission 2
 
+### File descriptions
+
+While there should be enough documentation inside the files, here is a high level description of the various files:
+
+#### agents
+
+- simple_agents.py: some dummy baseline agents for testing basic behaviour of the environment. Also led to some interesting insights about the game, more on that later.
+- medium_agents.py: not really used, this was during a time period where I didn't realize yet that the state-action table for the simple Q-learning agent was even more stupid than most dummy baselines.
+- alpha_zero.py: contains the architecture from the original [AlphaZero](https://arxiv.org/pdf/1712.01815) architecture
+
+#### environment
+
+- board.py: OthelloBoard with all necessary functionalities necessary for playing and training
+- replay_buffer.py: A replay buffer based on the kaggle-data from above. Not used however, as I only implemented the alpha zero architecture, which is not based on past experience but learns the game from scratch without any input besides a state representation and the available actions in the current state
+
+#### test
+
+- test.py: This file contains all tests created by me.
+
+#### train
+
+- train_alphazero.py: desired configuration of the architecture, optimizer, batch size and so on. Automatically tries to retrieve past checkpoints created with this configuration; either starts training from scratch or from last checkpoint.
+
+#### utils
+
+- agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). Stores the results afterwards in /out/agent\_
+
+### Description of end-to-end pipeline
+
+- establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
+
+
+
 ### Error metric
 
 I have done a lot of research on error metrics for reinforcement learning, and my final conclusion is that it makes no sense to use a different 
@@ -62,12 +95,18 @@ metric for the AlphaZero-architecture. For neural networks, there is no one-size
 case for reinforcement learning. Also, I did not find a lot of research on the various impacts of different error metrics for different architectures
 in this area. Trying out multiple different error metrics was just not possible given the time I needed to train a single model on my laptop.
 I also assume that authors of such papers which did have such resources used the error metric which worked the best. The arguments above were enough
-for me to proceed with the original error metric.
+for me to proceed with the original error metric provided by the authors.
 \\\\
 The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
+\\
+It can be split up into the following parts:
+\\
+$(z-v)^2$: this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing the neural network towards accurately predicting game outcomes.
+\\
+$-\pi^T*log(p)$: This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo Tree Search. This part based on negative log-likelihood pushes the networks predicted move towards the improved policy.
+\\
+$\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is rather important in such a small network.
 
-- establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
-- 
 
 ## Interesting aspects arising during implementation (written for Submission 2)
 
