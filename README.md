@@ -90,7 +90,7 @@ While there should be enough documentation inside the files, here is a high leve
 
 In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is basically a generic training class besides the loss function which I had to implemented on my own. One could just put an if-bracket above it and use
 a parameter for it, but I didn't get this far. The main-function in this file can be used to load different models, optimizers and checkpoints if available.
-\\
+
 
 
 
@@ -103,15 +103,15 @@ case for reinforcement learning. Also, I did not find a lot of research on the v
 in this area. Trying out multiple different error metrics was just not possible given the time I needed to train a single model on my laptop.
 I also assume that authors of such papers which did have such resources used the error metric which worked the best. The arguments above were enough
 for me to proceed with the original error metric provided by the authors.
-\\\\
+
 The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
-\\
+
 It can be split up into the following parts:
-\\
+
 $(z-v)^2$: this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing the neural network towards accurately predicting game outcomes.
-\\
+
 $-\pi^T*log(p)$: This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo Tree Search. This part based on negative log-likelihood pushes the networks predicted move towards the improved policy.
-\\
+
 $\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is rather important in such a small network.
 
 
