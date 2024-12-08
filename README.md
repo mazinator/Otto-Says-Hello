@@ -80,11 +80,20 @@ While there should be enough documentation inside the files, here is a high leve
 
 #### utils
 
-- agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). Stores the results afterwards in /out/agent\_
+- agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). Stores the results afterwards in /out/agent\_vs\_agent\_results.csv.
+- data_loader.py: loads and returns the data used in the file replay_buffer.py, also was able to load the simple Q-learning agent.
+- mcts.py: Contains the monte carlo tree search used in the AlphaZero model to estimate the value of the currently available state-action pairs
+- model_loader.py: Loads the latest alpha-zero model from checkpoint if available
+- nn_helpers.py: two functions which incldue a get_device() function and a transform-function from board to tensor (a board is represented by a 8x8 grid with each field being either black, white or empty. The input for AlphaZero are 3 8x8 tensors + the current player)
+- results_writer.py: writes stuff to agent_vs_agent_results.csv
+
 
 ### Description of end-to-end pipeline
 
-- establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
+In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is basically a generic training class besides the loss function which I had to implemented on my own. One could just put an if-bracket above it and use
+a parameter for it, but I didn't get this far. The main-function in this file can be used to load different models, optimizers and checkpoints if available.
+\\
+
 
 
 
@@ -108,12 +117,12 @@ $-\pi^T*log(p)$: This term measures the divergence between the predicted move pr
 $\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is rather important in such a small network.
 
 
-## Interesting aspects arising during implementation (written for Submission 2)
+## A few remarks every now and then regarding my progress.
 
 - I seem to have underestimated the level of computational power needed for training an Othello-bot even with limited resources. (18.11.2024)
 - I did loose some time while implementing the simple Q-learning agent, as I thought that the training was broken. However, after a little
   more research, it seems that indeed even 2 full days of training is not enough for this Q-Agent to even consistenly beat the RandomAgent, while
-  loosing big time against the MaxAgent. (18.11.2024)
+  loosing big time against the MaxAgent. (16.11.2024)
 - A very popular strategy in (standard) Othello is to perform moves at the beginning where not a lost of disks are flipped, as this limits the
   number of moves the opponent can make. This probably leads to the player being able to flip a lot of disks at the end of the game. As I already
   spent a lot of time and overnight-laptop-resources on this project, I did not loose time to directly implement such a strategy or even take
@@ -121,9 +130,24 @@ $\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in th
 - What I did however, was to implement two very simple agents: MinAgent (always choosing the move with the least disks flipped) and the MaxAgent (vice versa).
   At least I personally was very convinced that the MaxAgent should beat the MinAgent all the time, which was also confirmed by my tests. However,
   a fews after, I realized that the MaxAgent always won because the MinAgent started! This can maybe be somehow explained by the fact that always more or
-  less the same game is played with those two opponents, however it was still very unexpected. (18.11.2024)
+  less the same game is played with those two opponents, however it was still rather unexpected. (18.11.2024)
 - Overall, I did have to make some decisions on which parts of the Othello-game to explore, as e.g. handcrafting features alone would have probably been enough to
   fill this project. Naturally, I decided to focus on the 'Deep' part. (18.11.2024)
+- Storing checkpoint for AlphaZero is really nice, takes just around 2.5MB per checkpoint. (20.11.2024)
+- A quick note on how important the learning rate is: using lr 0.0001 learned basically nothing, while lr 0.001 played a solid round after an hour of training. (21.11.2024)
+- My training for alpha-zero was probably broken. After the first 300.000 rounds, the model was actually able to beat me a few times, and it definitely learned the
+  importance of corners and walls, as it tried to push me near such places and then taking over my stones directly afterwards. However it just stopped 
+  getting smarter from that point forward and even degenerated for a while. I am not even sure if it is really broken or I just need more computational power. I trained
+  for around 2.5 million episodes, and it was at the end really smart, however I realized that it can be pushed into two very bad positions (B2, B7, G2, G7) which
+  if played smartly almost inevitably leads to a win for me. So is it really broken or just too stupid yet? I have also changed the batch sizes significantly 
+  (128 to around 100.000) to see how this influences the outcome, which makes it a little hard to evaluate the separate effects. (26.11.2024)
+- Addition to earlier: I have changed the batch size to such a high number because I read a paper where their 'mini-batch' was around 4 Million tuples per iteration.
+  As far as I understood batch sizes, the only upper bound set for the batch size is that it shouldn't be the whole data and that it fits into memory. However, this
+  is only seems to be a valid assumption for very big networks. For smaller networks such as AlphaZero, one should probably not use such big batch sizes, as it 
+  could lead to instable training for this case. (4.12.2024)
+- I probably broke something during refactoring the code a few days ago, I just realized that the loss is NaN which is a pretty good explanation on why the 
+  training was shit for like 2 million episode. Always print the loss... (8.12.2024)
+- I will try to fix the issue until tomorrow and then start training for the last time, afterwards I just accept whatever the result is. (8.12.2024) 
 
 # How this project turned out
 
@@ -132,36 +156,13 @@ big reinforcement project. Excluding sandboxes, this was my first bigger reinfor
 the main challenge (even though I have once again learned various new aspects of them), but rather the significantly different approach of implementation
 compared to (un)supervised learning. Before even starting with the alpha zero architecture mid-november, the level of research and learning I had just on the 
 topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) 
-book. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
+book. For example, I spent around a few hours in understanding the MuZero architecture before realising that it is an overkill for problems without hidden 
+states such as Blackjack. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
 and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
 \\\\
 Overall, I learned a lot about constructing good test cases, I was able to strengthen my experience in reinforcement learning, I had a lot of fun playing 
 and experimenting in my environment, and I played a ton of Othello games which was also fun. 
 \\\\
-Feel free to shit-talk my repo and workflows, appreciate the time taken.
+Feel free to shit-talk my repo and workflows, I appreciate the time taken and discovering a few aspects which I don't know yet :-)
 \\\\
 As always when trying to deep-dive into a topic: now I know that I know nothing.
-
-
-## Remove before submission
-
-notes on important aspects of the Othello Game: 
-- auf versch. strategies trainieren: z.B. take as less / much pieces as possible
-- sweet 16? bleibt das game eher in der mitte?
-- äußerer Rand wird von mtte nach rand in B,A,C unterteilt.
-- 1 rein auf beiden achsen richtung mitte sind X squares, die sind sehr wichtig anscheinend
-- strategy: taking as less pieces as possible
-- don't play the X squares -> von dort am ehesten der jump in die ecke
-- gedankengang: mehrere flippen kann gut sein -> falls keine neuen moves
-für den gegner entstehen
-- maximizing no. of moves 
-- change of strategies, zb mit minimizing starten und dann spätere
-'facts' reintrainieren?
-- szenarien/konkrete wichtige spielsituationen irgendwie spezifischer ins training einbauen?
-WICHTIG: https://github.com/2Bear/othello-zero
-Erkenntnisse:
-- MinAgent vs MaxAgent:
-  - Gewinner ist derjenige, der nicht beginnt! Immer. whut
-
-- mu zero macht keinen Sinn hier, da bei othello keine unkown oder partially observable dynamics vorhanden sind
-- 
