@@ -9,21 +9,26 @@ After watching a few "how to beat everyone in Othello"-videos, the following see
 
 * try to control the inner 4x4 matrix
 * try evolving to the wall, as these spots (especially the corners) have a big advantage
-* having less pieces than the opponent is not a bad thing, if parts of the inner 4x4 and a few spots on the walls are presevered. Having more pieces leads to more possible positions from where stones can be flipped.
+* having less pieces than the opponent is not a bad thing, if parts of the inner 4x4 and a few spots on the walls are presevered. Having more pieces 
+  leads to more possible positions from where stones can be flipped.
 
 
 It can be concluded that the Othello game has the following properties / leads to the following conclusions:
 1. It is markov (the future is only dependent on the current state, not the past)
 2. Its state space is too big for a tabular solution, i.e. it is computationally not feasible to calculate all states (to be more precise, at least for a 10x10 field)
-4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly reduces the chance of winning)
-5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options I can think of for assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
+4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly 
+   reduces the chance of winning)
+5. Decisions about contribution to reward probably should not be made before the end of the episode; Besides winning, the only other two options I can 
+   think of for assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
-Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, other configurations will be tryed out depending on the computational resources.
+Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, other configurations will be 
+tryed out depending on the computational resources.
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
 
 The following papers seem as an interesting starting point into this subject:
-- [OLIVAW: Mastering Othello without Human Knowledge, nor a Fortune](https://arxiv.org/abs/2103.17228). This paper from 2021 aims to minimze the computational power needed to achieve the performance of the state of the art, which covers the aspect of keeping computational cost as low as possible.
+- [OLIVAW: Mastering Othello without Human Knowledge, nor a Fortune](https://arxiv.org/abs/2103.17228). This paper from 2021 aims to minimze the computational power needed to achieve 
+  the performance of the state of the art, which covers the aspect of keeping computational cost as low as possible.
 - [Deep reinforcement Learning Using Monte-Carlo Tree Search for Hex and Othello](https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/2777474).
 - [Hierarchical Reinforcement Learning for the Game of Othello](https://ir.canterbury.ac.nz/bitstreams/51750833-63c1-42a6-b7bf-08ecd4c58434/download)
 - [Q-learning adaptations in the game Othello](https://fse.studenttheses.ub.rug.nl/id/eprint/23027)
@@ -42,10 +47,12 @@ However, three different approaches will be implemented:
 
 ## Work-packages
 
-- Read through papers above to fully grasp state-of-the-art-approaches (originally intended: 10h. actually: idk I lost track of the time as watched also a lot of content on YouTube, so probably way more than 10 hours(
+- Read through papers above to fully grasp state-of-the-art-approaches (originally intended: 10h. actually: idk I lost track of the time as watched also 
+  a lot of content on YouTube, so probably way more than 10 hours(
 - Set up infrastructure (originally intended: 15h. Actually: creating the board, a lot of tests and a few simple baseline agents took around 15 hours)
 - Implement SOFA (Q-learning) (originally intended: 15h. Completely skipped that part, as those architecture were too expensive for my computer)
-- Implement the approaches mentioned above (originally intended: 10h each. Took me around 5h to implement a replay buffer from existing games, however never really used because alpha zero, the only architecture I have implemented is not based on a replay buffer but on Monte Carlo Tree Search)
+- Implement the approaches mentioned above (originally intended: 10h each. Took me around 5h to implement a replay buffer from existing games, however 
+  never really used because alpha zero, the only architecture I have implemented is not based on a replay buffer but on Monte Carlo Tree Search)
 - Finetune Neural Net, try out different architectures (intended: 35h. Did not try out different architectures but definitely more than 35h)
 - Debugging (intended: More on the section below on 'How this project turned out')
 - Using an existing application to showcase the results (intended: 5h. TBD for final presentation)
@@ -59,14 +66,18 @@ While there should be enough documentation inside the files, here is a high leve
 
 #### agents
 
-- simple_agents.py: some dummy baseline agents for testing basic behaviour of the environment. Also led to some interesting insights about the game, more on that later.
-- medium_agents.py: not really used, this was during a time period where I didn't realize yet that the state-action table for the simple Q-learning agent was even more stupid than most dummy baselines.
+- simple_agents.py: some dummy baseline agents for testing basic behaviour of the environment. Also led to some interesting insights about the game, 
+  more on that later.
+- medium_agents.py: not really used, this was during a time period where I didn't realize yet that the state-action table for the simple Q-learning 
+  agent was even more stupid than most dummy baselines.
 - alpha_zero.py: contains the architecture from the original [AlphaZero](https://arxiv.org/pdf/1712.01815) architecture
 
 #### environment
 
 - board.py: OthelloBoard with all necessary functionalities necessary for playing and training
-- replay_buffer.py: A replay buffer based on the kaggle-data from above. Not used however, as I only implemented the alpha zero architecture, which is not based on past experience but learns the game from scratch without any input besides a state representation and the available actions in the current state
+- replay_buffer.py: A replay buffer based on the kaggle-data from above. Not used however, as I only implemented the alpha zero architecture, 
+  which is not based on past experience but learns the game from scratch without any input besides a state representation and the available 
+  actions in the current state
 
 #### test
 
@@ -74,21 +85,25 @@ While there should be enough documentation inside the files, here is a high leve
 
 #### train
 
-- train_alphazero.py: desired configuration of the architecture, optimizer, batch size and so on. Automatically tries to retrieve past checkpoints created with this configuration; either starts training from scratch or from last checkpoint.
+- train_alphazero.py: desired configuration of the architecture, optimizer, batch size and so on. Automatically tries to retrieve past checkpoints 
+  created with this configuration; either starts training from scratch or from last checkpoint.
 
 #### utils
 
-- agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). Stores the results afterwards in /out/agent\_vs\_agent\_results.csv.
+- agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). 
+  Stores the results afterwards in /out/agent\_vs\_agent\_results.csv.
 - data_loader.py: loads and returns the data used in the file replay_buffer.py, also was able to load the simple Q-learning agent.
 - mcts.py: Contains the monte carlo tree search used in the AlphaZero model to estimate the value of the currently available state-action pairs
 - model_loader.py: Loads the latest alpha-zero model from checkpoint if available
-- nn_helpers.py: two functions which incldue a get_device() function and a transform-function from board to tensor (a board is represented by a 8x8 grid with each field being either black, white or empty. The input for AlphaZero are 3 8x8 tensors + the current player)
+- nn_helpers.py: two functions which incldue a get_device() function and a transform-function from board to tensor (a board is represented by a 8x8 grid with 
+  each field being either black, white or empty. The input for AlphaZero are 3 8x8 tensors + the current player)
 - results_writer.py: writes stuff to agent_vs_agent_results.csv
 
 
 ### Description of end-to-end pipeline
 
-In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is basically a generic training class besides the loss function which I had to implemented on my own. One could just put an if-bracket above it and use
+In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is basically a generic training class besides the loss function which I 
+had to implemented on my own. One could just put an if-bracket above it and use
 a parameter for it, but I didn't get this far. The main-function in this file can be used to load different models, optimizers and checkpoints if available.
 
 
@@ -108,11 +123,14 @@ The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
 
 It can be split up into the following parts:
 
-$(z-v)^2$: this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing the neural network towards accurately predicting game outcomes.
+$(z-v)^2$: this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing 
+the neural network towards accurately predicting game outcomes.
 
-$-\pi^T*log(p)$: This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo Tree Search. This part based on negative log-likelihood pushes the networks predicted move towards the improved policy.
+$-\pi^T*log(p)$: This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo 
+Tree Search. This part based on negative log-likelihood pushes the networks predicted move towards the improved policy.
 
-$\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is rather important in such a small network.
+$\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is especially important 
+in such a small network.
 
 
 ## A few remarks every now and then regarding my progress.
@@ -154,8 +172,9 @@ big reinforcement project. Excluding sandboxes, this was my first bigger reinfor
 the main challenge (even though I have once again learned various new aspects of them), but rather the significantly different approach of implementation
 compared to (un)supervised learning. Before even starting with the alpha zero architecture mid-november, the level of research and learning I had just on the 
 topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) 
-book. For example, I spent around a few hours in understanding the MuZero architecture before realising that it is an overkill for problems without hidden 
-states such as Blackjack. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
+book. For example, I spent 2-3 hours in understanding the MuZero architecture before realising that it is an overkill for problems without hidden 
+states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
+resources for most of them. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
 and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
 \\\\
 Overall, I learned a lot about constructing good test cases, I was able to strengthen my experience in reinforcement learning, I had a lot of fun playing 
@@ -163,4 +182,4 @@ and experimenting in my environment, and I played a ton of Othello games which w
 \\\\
 Feel free to shit-talk my repo and workflows, I appreciate the time taken and discovering a few aspects which I don't know yet :-)
 \\\\
-As always when trying to deep-dive into a topic: now I know that I know nothing.
+As always when one tries to deep-dive into a topic: now I know that I know nothing.
