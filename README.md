@@ -1,6 +1,6 @@
 # Otto-Says-Hello
 
-*Sarcasm and overconfidence: ON*
+**Sarcasm and overconfidence: ON**
 
 Otto trying to beat everyone in Othello.
 
