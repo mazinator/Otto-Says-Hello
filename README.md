@@ -176,10 +176,10 @@ book. For example, I spent 2-3 hours in understanding the MuZero architecture be
 states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
 resources for most of them. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
 and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
-\\\\
+
 Overall, I learned a lot about constructing good test cases, I was able to strengthen my experience in reinforcement learning, I had a lot of fun playing 
 and experimenting in my environment, and I played a ton of Othello games which was also fun. 
-\\\\
+
 Feel free to shit-talk my repo and workflows, I appreciate the time taken and discovering a few aspects which I don't know yet :-)
-\\\\
+
 As always when one tries to deep-dive into a topic: now I know that I know nothing.
