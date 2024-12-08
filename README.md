@@ -177,7 +177,7 @@ Actually achieved error metric: TODO write final result
   could lead to instable training for this case. (4.12.2024)
 - I probably broke something during refactoring the code a few days ago, I just realized that the loss is NaN which is a pretty good explanation on why the 
   training was shit for like 1 million episodes. Always print the loss... (8.12.2024)
-- 
+
 
 # How this project turned out
 
