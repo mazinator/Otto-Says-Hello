@@ -132,6 +132,20 @@ Tree Search. This part based on negative log-likelihood pushes the networks pred
 $\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is especially important 
 in such a small network.
 
+It is a little hard to define an expected loss beforehand for an error metric which is composed of 3 different parts with different natures, this was my
+best initial estimate:
+
+1. $(z-v)^2$ should be expected to fall under 0.01
+2. $-\pi^T*log(p)$ can be expected to be at around 0.5
+3. $\lVert\theta\rVert^2$ is hard to estimate; I found suggestions of it being around 5% of the combined value and policy loss.
+
+Combining these 3 assumptions lead to an estimated error of around 0.6 or so being 'good'. This also means that the MSE part should 
+naturally be very low rather quickly and does not play a role afterwards. The regularization term only plays a significant role
+if some very big parameters are derived from the optimizer. So the biggest chunk of the work goes to pushing the network towards
+the improved policy, which makes sense at least on an abstract level.
+
+Actually achieved error metric: TODO write final result
+
 
 ## A few remarks every now and then regarding my progress.
 
@@ -162,8 +176,8 @@ in such a small network.
   is only seems to be a valid assumption for very big networks. For smaller networks such as AlphaZero, one should probably not use such big batch sizes, as it 
   could lead to instable training for this case. (4.12.2024)
 - I probably broke something during refactoring the code a few days ago, I just realized that the loss is NaN which is a pretty good explanation on why the 
-  training was shit for like 2 million episode. Always print the loss... (8.12.2024)
-- I will try to fix the issue until tomorrow and then start training for the last time, afterwards I just accept whatever the result is. (8.12.2024) 
+  training was shit for like 1 million episodes. Always print the loss... (8.12.2024)
+- 
 
 # How this project turned out
 
