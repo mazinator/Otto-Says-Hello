@@ -64,7 +64,7 @@ in this area. Trying out multiple different error metrics was just not possible 
 I also assume that authors of such papers which did have such resources used the error metric which worked the best. The arguments above were enough
 for me to proceed with the original error metric.
 \\\\
-The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\lVert\theta||^2$
+The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
 
 - establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
 - 
