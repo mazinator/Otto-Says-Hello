@@ -5,7 +5,6 @@
 
 Otto trying to beat everyone in Othello.
 
-
 Otto is an AI bot trained with deep reinforcement learning to destroy any hopes of ever beating him in Othello. 
 
 After watching a few "how to beat everyone in Othello"-videos, the following seem to be the most important aspects for human players:
@@ -43,19 +42,30 @@ However, three different approaches will be implemented:
 - train on human-generated games, afterwards on simulated ones
 
 
-## Intended work-packages
+## Work-packages
 
 - Read through papers above to fully grasp state-of-the-art-approaches (originally intended: 10h. actually: idk I lost track of the time as watched also a lot of content on YouTube, so probably way more than 10 hours(
 - Set up infrastructure (originally intended: 15h. Actually: creating the board, a lot of tests and a few simple baseline agents took around 15 hours)
-- Implement SOFA (Q-learning) (15h)
-- Implement the approaches mentioned above (10h each)
-- Finetune Neural Net, try out different architectures (35h)
-- Using an existing application to showcase the results (5h)
-- Final report and presentation (5h)
+- Implement SOFA (Q-learning) (originally intended: 15h. Completely skipped that part, as those architecture were too expensive for my computer)
+- Implement the approaches mentioned above (originally intended: 10h each. Took me around 5h to implement a replay buffer from existing games, however never really used because alpha zero, the only architecture I have implemented is not based on a replay buffer but on Monte Carlo Tree Search)
+- Finetune Neural Net, try out different architectures (intended: 35h. Did not try out different architectures but definitely more than 35h)
+- Debugging (intended: More on the section below on 'How this project turned out')
+- Using an existing application to showcase the results (intended: 5h. TBD for final presentation)
+- Final report and presentation (intended: 5h. TBD for final presentation)
 
 ## Deliverables for Submission 2
 
-- Error Metric TODO gibts da überhaupt ah auswahl
+### Error metric
+
+I have done a lot of research on error metrics for reinforcement learning, and my final conclusion is that it makes no sense to use a different 
+metric for the AlphaZero-architecture. For neural networks, there is no one-size-fits-all solution; my feeling is that this is even more the
+case for reinforcement learning. Also, I did not find a lot of research on the various impacts of different error metrics for different architectures
+in this area. Trying out multiple different error metrics was just not possible given the time I needed to train a single model on my laptop.
+I also assume that authors of such papers which did have such resources used the error metric which worked the best. The arguments above were enough
+for me to proceed with the original error metric.
+\\\\
+The loss function is defined as: $L=(z-v)^2-\pi^2*log(p)+||\theta||^2$
+
 - establish working end to end pipeline as a baseline for further experimentation TODO hab i eig schon abgesehen vom NN teil, muss no beschrieben werden
 - 
 
@@ -75,6 +85,24 @@ However, three different approaches will be implemented:
   less the same game is played with those two opponents, however it was still very unexpected. (18.11.2024)
 - Overall, I did have to make some decisions on which parts of the Othello-game to explore, as e.g. handcrafting features alone would have probably been enough to
   fill this project. Naturally, I decided to focus on the 'Deep' part. (18.11.2024)
+
+# How this project turned out
+
+The magnitude of how much I underestimated the work necessary to reach my original goals is laughable. They maybe would have been somewhat realistic if it was my 5th 
+big reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. And I wouldn't necessarily say that the neural network itself was 
+the main challenge (even though I have once again learned various new aspects of them), but rather the significantly different approach of implementation
+compared to (un)supervised learning. Before even starting with the alpha zero architecture mid-november, the level of research and learning I had just on the 
+topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) 
+book. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
+and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
+\\\\
+Overall, I learned a lot about constructing good test cases, I was able to strengthen my experience in reinforcement learning, I had a lot of fun playing 
+and experimenting in my environment, and I played a ton of Othello games which was also fun. 
+\\\\
+Feel free to shit-talk my repo and workflows, appreciate the time taken.
+\\\\
+As always when trying to deep-dive into a topic: now I know that I know nothing.
+
 
 ## Remove before submission
 
