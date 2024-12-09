@@ -1,4 +1,10 @@
 """
+IMPORTANT!
+I later that trying to solve such a problem with a simple Q-learning agent
+was hopeless from the beginning, the search space is just to big especially if you train
+on a laptop. I left this as a proof for 'I tried'.
+
+
 This file contains some more sophisticated agents, i.e. SARSA and Q-Learning without a Deep neural approach
 
 - Q-learning will learn on the human-played games (possible as it is off-policy)
@@ -6,8 +12,8 @@ This file contains some more sophisticated agents, i.e. SARSA and Q-Learning wit
 
 NOTE: Due to the fact that I already invested like 40 hours and didn't
 even start yet with the neural network, I reference to the realm of papers that exist which
-indicate that a simple SARSA algorithm would be as bad as simple Q-learning, besides the effect
-that SARSA cannot even make use of the ReplayBuffer as it is on-policy algorithm.
+indicate that a simple SARSA algorithm would be as bad as simple Q-learning, besides the fact
+that SARSA cannot even make use of the ReplayBuffer as it is an on-policy algorithm.
 """
 import random
 
@@ -55,12 +61,11 @@ class SimpleQLearningAgent:
         """
         Update the Q-value for a given state-action pair using the Q-learning formula.
 
-        Args:
-            player (int): The player who took the action.
-            state (tuple): Current state.
-            action (tuple): Action taken.
-            reward (float): Reward received after taking the action.
-            next_state (tuple): Next state after taking the action.
+        :param player (int): The player who took the action.
+        :param state (tuple): Current state.
+        :param action (tuple): Action taken.
+        :param reward (float): Reward received after taking the action.
+        :param next_state (tuple): Next state after taking the action.
         """
         current_q = self.q_table.get((state, action), 0)
         future_rewards = [self.q_table.get((next_state, a), 0) for a in self.board.get_valid_actions(self.board.next_player)]

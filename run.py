@@ -2,7 +2,6 @@ from src.agents.medium_agents import *
 from src.test.test import *
 from src.utils.data_loader import *
 from src.environment.replay_buffer import *
-import argparse
 
 
 def main(run_tests=False):

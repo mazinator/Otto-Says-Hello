@@ -303,3 +303,33 @@ class OthelloBoard:
         black_count = np.sum(self.board == 0)
         white_count = np.sum(self.board == 1)
         return {'black': black_count, 'white': white_count}
+
+    @classmethod
+    def from_numpy(cls, board_array, next_player):
+        """
+        Creates an OthelloBoard instance from a NumPy array or a hashable representation.
+
+        :param board_array: NumPy array or tuple of tuples representing the board state.
+        :param next_player: The next player to play (0 for black, 1 for white).
+        :return: An OthelloBoard instance with the given state.
+        """
+        if isinstance(board_array, tuple):
+            # Convert tuple of tuples back to NumPy array
+            board_array = np.array(board_array, dtype=np.int32)
+
+        # Validate the board size
+        rows, cols = board_array.shape
+        if rows < 6 or rows > 26 or cols < 6 or cols > 26 or rows % 2 != 0 or cols % 2 != 0:
+            raise ValueError("Board dimensions must be even and between 6x6 and 26x26.")
+
+        # Create a new OthelloBoard instance
+        board_instance = cls(rows=rows, cols=cols, first_player=next_player)
+
+        # Set the board state and next player
+        board_instance.board = board_array
+        board_instance.next_player = next_player
+
+        # Update the initial board state if desired
+        board_instance.initial_board = np.full((rows, cols), -1)
+
+        return board_instance

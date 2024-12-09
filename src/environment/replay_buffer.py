@@ -74,6 +74,42 @@ class ReplayBuffer:
         return len(self.buffer)
 
 
+class ReplayBufferAlphaZero:
+    def __init__(self, capacity=20000):
+        """
+        Initialize the replay buffer.
+
+        :param capacity: Maximum number of experiences the buffer can store.
+        """
+        self.buffer = deque(maxlen=capacity)
+
+    def add(self, state, target_policy, reward):
+        """
+        Add a new experience to the buffer.
+
+        :param state: Current state (board configuration).
+        :param target_policy: TODO
+        :param reward: Reward received for the action.
+        """
+        self.buffer.append((state, target_policy, reward))
+
+    def sample(self, batch_size):
+        """
+        Sample a batch of experiences from the buffer.
+
+        :param batch_size: Number of experiences to sample.
+
+        :returns: tuple of form: (states, target_policies, rewards, next_states, dones).
+        """
+        return random.sample(self.buffer, min(batch_size, len(self.buffer)))
+
+    def __len__(self):
+        """
+        Get the current size of the buffer.
+        """
+        return len(self.buffer)
+
+
 def create_and_store_replay_buffer(output_file=OUT_FILE):
     """
     Create a replay buffer from the Othello dataset.

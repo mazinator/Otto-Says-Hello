@@ -35,7 +35,7 @@ def get_agent(args):
     elif agent_arg == 'alphazero':
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
         model = AlphaZeroNet(args.fieldSize, args.fieldSize).to(device)
-        checkpoint_path = get_checkpoint('cp_alphazero_0.001_lr', '.checkpoints')
+        checkpoint_path, episode_loaded = get_checkpoint('cp_alphazero_0.001_lr', '.checkpoints')
         if checkpoint_path:
             checkpoint = torch.load(checkpoint_path, map_location=device)
             model.load_state_dict(checkpoint['model_state_dict'])
@@ -83,18 +83,8 @@ def play_game(args):
                 except Exception as e:
                     print(e)
         else:
-            if isinstance(agent, AlphaZeroNet):
-                print(f"AlphaZero ({['black', 'white'][current_player]}) is thinking...")
-                device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-                board_tensor = prepare_board_tensor(board.board, current_player, device).to(device)
-                with torch.no_grad():
-                    policy, _ = agent(board_tensor)
-                valid_moves = board.get_valid_actions(current_player)
-                move_probs = torch.exp(policy).cpu().numpy().flatten()
-                move = max(valid_moves, key=lambda mv: move_probs[mv[0] * board.cols + mv[1]])
-            else:
-                print(f"Agent ({['black', 'white'][current_player]}) is thinking...")
-                move = agent.get_action(board=board, player=current_player)
+            print(f"{agent.__class__.__name__} ({['black', 'white'][current_player]}) is thinking...")
+            move = agent.get_action(board=board, player=current_player)
             print(f"Agent chose: {chr(move[1] + ord('A'))}{move[0] + 1}")
             board.make_action(move, current_player)
 

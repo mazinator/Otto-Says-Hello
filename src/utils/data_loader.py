@@ -101,3 +101,4 @@ def load_q_agent(board, filename=PATH_SIMPLE_Q_LEARNER):
 
     print(f"Agent data loaded from {filename}")
     return q_agent
+
