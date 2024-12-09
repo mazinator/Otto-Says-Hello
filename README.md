@@ -177,6 +177,8 @@ Actually achieved error metric: TODO write final result
   could lead to instable training for this case. (4.12.2024)
 - I probably broke something during refactoring the code a few days ago, I just realized that the loss is NaN which is a pretty good explanation on why the 
   training was shit for like 1 million episodes. Always print the loss... (8.12.2024)
+- I think I fixed it :) It is really amazing how robust and forgiving neural networks can be - I have no idea why the shit that I called 'code' produced anything
+  meaningful at all. Always triple check dimensions and intermediate results. (10.12.2024)
 
 
 # How this project turned out
