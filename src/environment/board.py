@@ -157,7 +157,7 @@ class OthelloBoard:
 
         # A action has to flip at least 1 disk
         if not self.action_is_flipping_disks(row_idx, col_idx, player):
-            raise ValueError("Invalid action.")
+            raise ValueError("Invalid action, not flipping any disks.")
 
         self.board[row_idx, col_idx] = player
         self.flip_disks(row_idx, col_idx, player)

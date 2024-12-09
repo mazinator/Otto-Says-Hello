@@ -137,7 +137,6 @@ class MCTS:
         else:
             # Apply softmax temperature scaling
             visit_counts = visit_counts ** (1 / tau)
-            total_count = sum(visit_counts)
             probabilities = visit_counts / visit_counts.sum()
 
             # Assign probabilities to valid actions in the policy grid
