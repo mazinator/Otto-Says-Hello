@@ -8,7 +8,6 @@ __pycache__/
 **.idea
 # C extensions
 *.so
-.checkpoints
 # Distribution / packaging
 .Python
 build/
