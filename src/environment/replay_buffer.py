@@ -14,10 +14,10 @@ I do not use a maxCapacity for my ReplayBuffer, as all games lead to
 a file size of 850MB, which is still reasonable for my laptop.
 """
 
-import random
+import random, torch
 from collections import deque
 import numpy as np
-import json
+import json, os
 
 from src.environment.board import OthelloBoard
 from src.utils.data_loader import read_othello_dataset
@@ -108,6 +108,50 @@ class ReplayBufferAlphaZero:
         Get the current size of the buffer.
         """
         return len(self.buffer)
+
+    def save_buffer(self, folder_path, filename):
+        """
+        Save the replay buffer to a Torch file.
+
+        :param folder_path: Directory where the file will be saved.
+        :param filename: Name of the file to save the buffer.
+        """
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path, filename)
+
+        # Convert buffer to a list of tuples and handle numpy serialization
+        buffer_list = [
+            (torch.tensor(state, dtype=torch.float32),
+             torch.tensor(target_policy, dtype=torch.float32),
+             reward) for state, target_policy, reward in self.buffer
+        ]
+        torch.save(buffer_list, file_path)
+        print(f"Saved buffer to {file_path}.")
+
+    def load_buffer(self, folder_path, filename):
+        """
+        Load the replay buffer from a Torch file.
+
+        :param folder_path: Directory where the file is located.
+        :param filename: Name of the file to load the buffer.
+        """
+        file_path = os.path.join(folder_path, filename)
+
+        # Load the buffer from a Torch file and handle numpy conversion
+        try:
+            buffer_list = torch.load(file_path)
+            self.buffer = deque([
+                (state.numpy() if isinstance(state, torch.Tensor) else state,
+                 target_policy.numpy() if isinstance(target_policy, torch.Tensor) else target_policy,
+                 reward) for state, target_policy, reward in buffer_list
+            ], maxlen=self.buffer.maxlen)
+
+            print(f"Loaded buffer from {file_path}.")
+
+        except Exception as e:
+            print(f"Error loading buffer from {file_path}. Exception: {e}. Starting with empty buffer.")
+
+
 
 
 def create_and_store_replay_buffer(output_file=OUT_FILE):

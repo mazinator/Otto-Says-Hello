@@ -35,7 +35,7 @@ def get_checkpoint(prefix, folder_path, episode_number=None):
         :param model_loaded:
     """
     if not os.path.exists(folder_path):
-        print(f"No pretrained model found under: {folder_path}. Starting from zero")
+        #print(f"No pretrained model found under: {folder_path}. Starting from zero")
         return None
 
     # Pattern to extract episode numbers from filenames
@@ -64,10 +64,15 @@ def get_checkpoint(prefix, folder_path, episode_number=None):
         return None, None
 
 
-def load_model(prefix, model):
+def load_model(prefix, model, folder_path='../../.checkpoints'):
     device = get_device()
 
-    checkpoint_path, episode = get_checkpoint(prefix, '../../.checkpoints')
+    try:
+        checkpoint_path, episode = get_checkpoint(prefix, folder_path)
+    except:
+        print(f"No pretrained model found for prefix: {prefix} in folder {folder_path}. Starting from zero")
+        return model, 1
+
     if checkpoint_path:
         checkpoint = torch.load(checkpoint_path, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])

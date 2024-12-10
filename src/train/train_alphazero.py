@@ -33,7 +33,7 @@ def display_timer(start_time):
 
         sys.stdout.write(f"\r{red_text}")
         sys.stdout.flush()
-        time.sleep(10)
+        time.sleep(5)
 
 
 def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, checkpoint_interval=500,
@@ -56,14 +56,17 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
     :param mcts_max_iterations: hyperparameter for MCTS
     """
 
+    replay_buffer = ReplayBufferAlphaZero()
+    replay_buffer.load_buffer('../../data/', 'replay_buffer_alphazero.pth')
+
     timer_thread = threading.Thread(target=display_timer, args=(time.time(),), daemon=True)
     timer_thread.start()
+
 
     model.to(device)
     start = time.time()
     start_episode = episode_loaded if model_loaded else 0
     loss, policy_loss, value_loss, regularization_term = 'TBD', None, None, None
-    replay_buffer = ReplayBufferAlphaZero()
 
     for episode in range(start_episode, episodes):
 
@@ -130,7 +133,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
         [replay_buffer.add(s, a, r) for s, a, r in zip(states, action_probs_list, rewards)]
 
         if episode % simulations_between_training == 0 and episode is not start_episode:
-            print(f'Starting to train {epochs_for_batches} batches after {episode-start_episode+1} episodes. Buffer '
+            print(f'Starting to train {epochs_for_batches} batches with size {batch_size} after {episode-start_episode+1} episodes. Buffer'
                   f'has length {len(replay_buffer)}.')
 
             for i in range(epochs_for_batches):
@@ -172,6 +175,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
         # Create checkpoint
         if (episode + 1) % checkpoint_interval == 0:
             save_checkpoint(model, optimizer, episode + 1)
+            replay_buffer.save_buffer('../../data/', 'replay_buffer_alphazero.pth')
 
 
 if __name__ == '__main__':
@@ -183,5 +187,5 @@ if __name__ == '__main__':
 
     # Train the model
     train_agent(board, model, optimizer, model_loaded=True, episode_loaded=episode,
-                checkpoint_interval=50, batch_size=32, epochs_for_batches=30,
-                mcts_max_iterations=2000, simulations_between_training=40)
+                checkpoint_interval=100, batch_size=32, epochs_for_batches=30,
+                mcts_max_iterations=5000, simulations_between_training=50)

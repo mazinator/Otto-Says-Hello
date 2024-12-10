@@ -13,7 +13,7 @@ After watching a few "how to beat everyone in Othello"-videos, the following see
   leads to more possible positions from where stones can be flipped.
 
 
-It can be concluded that the Othello game has the following properties / leads to the following conclusions:
+One can derive that the Othello game has the following properties:
 1. It is markov (the future is only dependent on the current state, not the past)
 2. Its state space is too big for a tabular solution, i.e. it is computationally not feasible to calculate all states (to be more precise, at least for a 10x10 field)
 4. It is a game where short-term decisions can heavily influence the final outcome (e.g., not placing a stone in a corner if possible highly significantly 
@@ -183,19 +183,24 @@ Actually achieved error metric: TODO write final result
 
 # How this project turned out
 
+Quick ragequit about myself:
 The magnitude of how much I underestimated the work necessary to reach my original goals is laughable. They maybe would have been somewhat realistic if it was my 5th 
-big reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. And I wouldn't necessarily say that the neural network itself was 
-the main challenge (even though I have once again learned various new aspects of them), but rather the significantly different approach of implementation
-compared to (un)supervised learning. Before even starting with the alpha zero architecture mid-november, the level of research and learning I had just on the 
-topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) 
-book. For example, I spent 2-3 hours in understanding the MuZero architecture before realising that it is an overkill for problems without hidden 
-states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
+big reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the alpha zero architecture mid-november, the 
+level of research and learning I had just on the topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based 
+on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) book. For example, I spent 2-3 hours in understanding the MuZero architecture before realising that it is an overkill for problems without 
+hidden states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
 resources for most of them. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
 and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
 
-Overall, I learned a lot about constructing good test cases, I was able to strengthen my experience in reinforcement learning, I had a lot of fun playing 
-and experimenting in my environment, and I played a ton of Othello games which was also fun. 
+Overall, I still feel like it was a great project:
 
-Feel free to shit-talk my repo and workflows, I appreciate the time taken and discovering a few aspects which I don't know yet :-)
 
-As always when one tries to deep-dive into a topic: now I know that I know nothing.
+* I learned a lot about constructing good test cases,
+* I was able to strengthen my experience in reinforcement learning,
+* I learned a lot about neural networks (especially how to effectively handle the dimension and debugging them),
+* I had a lot of fun playing and experimenting in my environment, 
+* and I played a ton of Othello games which was also fun.
+
+# Conclusion
+
+Now I know that I know nothing.
