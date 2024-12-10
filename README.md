@@ -22,9 +22,10 @@ One can derive that the Othello game has the following properties:
    think of for assigning rewards would be either for flipping a lot of stones or gaining a particular strong position on the field.
 
 Note: 8x8 Othello is claimed to be solved by a preprint from 2023. Otto will to be trained starting on a 8x8 configuration, other configurations will be 
-tryed out depending on the computational resources.
+tryed out depending on the computational resources. (Update from future me: 8x8 enough for my MacBook; main drawback is the MCTS simulation, not the model itself)
 
 Otto's goal is to beat the current performances of Othello-bots, with respect to the computational cost. (Bring you own method)
+(Update from future me: far off haha, I was able to successfully implement the original AlphaZero architecture)
 
 The following papers seem as an interesting starting point into this subject:
 - [OLIVAW: Mastering Othello without Human Knowledge, nor a Fortune](https://arxiv.org/abs/2103.17228). This paper from 2021 aims to minimze the computational power needed to achieve 
@@ -43,6 +44,9 @@ However, three different approaches will be implemented:
 - train on human-generated games only
 - train on simulated games only
 - train on human-generated games, afterwards on simulated ones
+- 
+(Update from future me: human-generated data is not necessary for the AlphaZero architecture as it learns from simulated games only. A 
+corresponding stream-reader and replay buffer and is implemented however.)
 
 
 ## Work-packages
@@ -54,7 +58,8 @@ However, three different approaches will be implemented:
 - Implement the approaches mentioned above (originally intended: 10h each. Took me around 5h to implement a replay buffer from existing games, however 
   never really used because alpha zero, the only architecture I have implemented is not based on a replay buffer but on Monte Carlo Tree Search)
 - Finetune Neural Net, try out different architectures (intended: 35h. Did not try out different architectures but definitely more than 35h)
-- Debugging (intended: More on the section below on 'How this project turned out')
+- Debugging (not planned originally. More on the section below on 'How this project turned out')
+- Implementation of MCTS (not planned originally. Lost a day on a somewhat efficient implementation before realizing that there are MCTS-packages available)
 - Using an existing application to showcase the results (intended: 5h. TBD for final presentation)
 - Final report and presentation (intended: 5h. TBD for final presentation)
 
@@ -63,6 +68,10 @@ However, three different approaches will be implemented:
 ### File descriptions
 
 While there should be enough documentation inside the files, here is a high level description of the various files:
+
+### play.py
+
+This class can be used to play against an agent of your choice, check out parse_args() function for available arguments.
 
 #### agents
 
@@ -75,25 +84,23 @@ While there should be enough documentation inside the files, here is a high leve
 #### environment
 
 - board.py: OthelloBoard with all necessary functionalities necessary for playing and training
-- replay_buffer.py: A replay buffer based on the kaggle-data from above. Not used however, as I only implemented the alpha zero architecture, 
-  which is not based on past experience but learns the game from scratch without any input besides a state representation and the available 
-  actions in the current state
+- replay_buffer.py: Contains 2 replay buffers; one would be for the kaggle data, the other one is used for AlphaZero (different requirements than first one)
 
 #### test
 
-- test.py: This file contains all tests created by me.
+- test.py: This file contains all tests created by me to verify a correct implementation of the environment, data loading and dummy agents.
 
 #### train
 
-- train_alphazero.py: desired configuration of the architecture, optimizer, batch size and so on. Automatically tries to retrieve past checkpoints 
-  created with this configuration; either starts training from scratch or from last checkpoint.
+- train_alphazero.py: desired configuration of the architecture, optimizer, batch size and so on. Automatically tries to retrieve past checkpoints
+  (model and replay_buffer) created with this configuration; either starts training from scratch or from last checkpoint.
 
 #### utils
 
 - agent\_vs\_agent\_simulation.py: contains a function which simulates n games between 2 agents with a defined first player (always black/white or alternating). 
   Stores the results afterwards in /out/agent\_vs\_agent\_results.csv.
 - data_loader.py: loads and returns the data used in the file replay_buffer.py, also was able to load the simple Q-learning agent.
-- mcts.py: Contains the monte carlo tree search used in the AlphaZero model to estimate the value of the currently available state-action pairs
+- mcts_wrapper.py: Contains the monte carlo tree search used in the AlphaZero model to estimate the value of the currently available state-action pairs
 - model_loader.py: Loads the latest alpha-zero model from checkpoint if available
 - nn_helpers.py: two functions which incldue a get_device() function and a transform-function from board to tensor (a board is represented by a 8x8 grid with 
   each field being either black, white or empty. The input for AlphaZero are 3 8x8 tensors + the current player)
@@ -102,11 +109,28 @@ While there should be enough documentation inside the files, here is a high leve
 
 ### Description of end-to-end pipeline
 
-In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is basically a generic training class besides the loss function which I 
-had to implemented on my own. One could just put an if-bracket above it and use
-a parameter for it, but I didn't get this far. The main-function in this file can be used to load different models, optimizers and checkpoints if available.
+In general, I tried to generalize my code as much as possible, e.g. train_alphazero.py is more or less a generic training class (maybe minor changes 
+necessary for different models). The main-function in this file can be used to load different models, optimizers and checkpoints if available, and
+all relevant hyperparameters for the model and the MCTS.
 
-
+Quick list of the parameters to set in train_agent() function:
+* board: OthelloBoard (currently, must be an 8x8 board but can be adjusted easily if desired)
+* model: Either AlphaZeroNet or AlphaZeroNetWithResiduals from alpha_zero.py
+* optimizer: e.g. Adam
+* episodes: max episodes (by default max.integer, doesn't stop training)
+* batch_size: batch_size (sampled from the ReplayBuffer)
+* checkpoint_interval: after this many episodes, current model and replay_buffer and will be saved.
+* model_loaded: boolean if training is from scratch or not, relevant for correct projection of current training episode
+* episode_loaded: the number of already trained episodes if model_loaded=True
+* c: hyperparameter for the regularization term in the loss function, the higher the more penalization for more extreme parameters
+* simulations_between_training: number of simulated games before the model is trained from the ReplayBuffer
+* epochs_for_batches: the number of epochs the model is trained (every 'simulations_between_training'-times)
+* mcts_max_time: hyperparameter for MCTS. the maximum time in seconds for the MCTS simulator package (e.g., with mostly 
+  60 actions per game, 1000 would lead to around 1min for one simulated game)
+* mcts_exploration_constant: hyperparameter for MCTS. constant used for UCB-estimation in MCTS
+* replay_buffer_folder_path: folder path to replay buffer file
+* replay_buffer_in: file name to read in replay buffer
+* replay_buffer_out: file name to write out replay buffer
 
 
 
@@ -178,7 +202,8 @@ Actually achieved error metric: TODO write final result
 - I probably broke something during refactoring the code a few days ago, I just realized that the loss is NaN which is a pretty good explanation on why the 
   training was shit for like 1 million episodes. Always print the loss... (8.12.2024)
 - I think I fixed it :) It is really amazing how robust and forgiving neural networks can be - I have no idea why the shit that I called 'code' produced anything
-  meaningful at all. Always triple check dimensions and intermediate results. (10.12.2024)
+  meaningful at all. Always triple check dimensions and intermediate results. (09.12.2024)
+- Looks good. (10.12.2024)
 
 
 # How this project turned out
@@ -197,7 +222,7 @@ Overall, I still feel like it was a great project:
 
 * I learned a lot about constructing good test cases,
 * I was able to strengthen my experience in reinforcement learning,
-* I learned a lot about neural networks (especially how to effectively handle the dimension and debugging them),
+* I learned a lot about neural networks (especially how to effectively handle the dimension and debugging them, but also on tuning hyperparameters),
 * I had a lot of fun playing and experimenting in my environment, 
 * and I played a ton of Othello games which was also fun.
 

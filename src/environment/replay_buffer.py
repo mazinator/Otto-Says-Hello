@@ -75,7 +75,7 @@ class ReplayBuffer:
 
 
 class ReplayBufferAlphaZero:
-    def __init__(self, capacity=20000):
+    def __init__(self, capacity=40000):
         """
         Initialize the replay buffer.
 
@@ -152,8 +152,6 @@ class ReplayBufferAlphaZero:
             print(f"Error loading buffer from {file_path}. Exception: {e}. Starting with empty buffer.")
 
 
-
-
 def create_and_store_replay_buffer(output_file=OUT_FILE):
     """
     Create a replay buffer from the Othello dataset.
@@ -211,8 +209,7 @@ def create_and_store_replay_buffer(output_file=OUT_FILE):
         Path(OUT_FILE).touch()
     else:
         Path(OUT_FILE).unlink()
-        Path(OUT_FILE).touch()
-
+        Path(OUT_FILE).touch()\
 
     # Save all experiences to the output file
     with open(output_file, 'w') as f:

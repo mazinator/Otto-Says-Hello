@@ -7,6 +7,12 @@ from src.utils.nn_helpers import prepare_alphazero_board_tensor
 
 class AlphaZeroNet(nn.Module):
     def __init__(self, rows, cols):
+        """
+        Rather simple implementation without residual blocks, used in the beginning because it was easier to debug
+
+        :param rows: int
+        :param cols: int
+        """
         super(AlphaZeroNet, self).__init__()
         self.rows = 8  # rows fixed currently!
         self.cols = 8  # cols fixed currently!
@@ -28,6 +34,7 @@ class AlphaZeroNet(nn.Module):
         self.value_fc2 = nn.Linear(64, 1)
 
     def forward(self, board_tensor):
+
         # Convert board to tensor and add batch and channel dimensions
         x = board_tensor.view(-1, 3, self.rows, self.cols).float()
 
@@ -52,6 +59,7 @@ class AlphaZeroNet(nn.Module):
         return p, v
 
     def get_action(self, player, board):
+
         print(f"AlphaZero ({['black', 'white'][player]}) is thinking...")
         board_tensor = prepare_alphazero_board_tensor(board.board, player)
         with torch.no_grad():
@@ -62,11 +70,12 @@ class AlphaZeroNet(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-    """
-    Residual block with Batch Normalization and ReLU activation.
-    Implements the structure: Conv2d -> BatchNorm -> ReLU -> Conv2d -> BatchNorm -> Add(Input)
-    """
     def __init__(self, channels):
+        """
+        Residual Block class for more sophisticated AlphaZero implementation.
+
+        :param channels:
+        """
         super(ResidualBlock, self).__init__()
         self.conv1 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(channels)
@@ -74,6 +83,7 @@ class ResidualBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(channels)
 
     def forward(self, x):
+
         residual = x
         x = F.relu(self.bn1(self.conv1(x)))
         x = self.bn2(self.conv2(x))
@@ -84,6 +94,13 @@ class ResidualBlock(nn.Module):
 
 class AlphaZeroNetWithResiduals(nn.Module):
     def __init__(self, rows, cols, num_residual_blocks=5):
+        """
+        Original AlphaZero architecture.
+
+        :param rows: int
+        :param cols: int
+        :param num_residual_blocks: int
+        """
         super(AlphaZeroNetWithResiduals, self).__init__()
         self.rows = rows
         self.cols = cols
@@ -109,6 +126,7 @@ class AlphaZeroNetWithResiduals(nn.Module):
         self.value_fc2 = nn.Linear(64, 1)
 
     def forward(self, board):
+
         # Ensure the board is properly shaped
         x = board.view(-1, 3, self.rows, self.cols).float()
 

@@ -22,6 +22,12 @@ from src.agents.alpha_zero import *
 device = get_device()
 
 def display_timer(start_time):
+    """
+    Prints the elapsed time in the console.
+
+    :param start_time: t.time()
+    """
+
     while True:
         elapsed_time = time.time() - start_time
         hours = int(elapsed_time // 3600)
@@ -38,7 +44,8 @@ def display_timer(start_time):
 
 def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, checkpoint_interval=500,
                 model_loaded=False, episode_loaded=None, c=10e-4, simulations_between_training=50,
-                epochs_for_batches=20, mcts_max_iterations=1000) -> None:
+                epochs_for_batches=20, mcts_max_time=1000, mcts_exploration_constant = math.sqrt(2),
+                replay_buffer_in=None, replay_buffer_out=None, replay_buffer_folder_path=None) -> None:
     """
     Trains an agent on selfplay.
 
@@ -51,13 +58,17 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
     :param model_loaded: boolean if training is from scratch or not
     :param episode_loaded: the number of already trained episodes if model_loaded=True
     :param c: hyperparameter for the regularization term in the loss function
-    :param simulations_between_training: the maximum time for the MCTS simulator package
+    :param simulations_between_training:
     :param epochs_for_batches: the number of batches to sample from the replay buffer.
-    :param mcts_max_iterations: hyperparameter for MCTS
+    :param mcts_max_time: hyperparameter for MCTS. the maximum time for the MCTS simulator package
+    :param mcts_exploration_constant:
+    :param replay_buffer_in:
+    :param replay_buffer_out:
+    :param replay_buffer_folder_path:
     """
 
     replay_buffer = ReplayBufferAlphaZero()
-    replay_buffer.load_buffer('../../data/', 'replay_buffer_alphazero.pth')
+    replay_buffer.load_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_in)
 
     timer_thread = threading.Thread(target=display_timer, args=(time.time(),), daemon=True)
     timer_thread.start()
@@ -73,7 +84,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
         board.reset_board()
 
         # Some print statements
-        if episode % 100 == 0:
+        if episode % 5 == 0:
             print(
                 f'Running episode: {episode} from {episodes}, running since {round((time.time() - start) / 60, 3)} minutes'
             )
@@ -100,7 +111,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
             initial_state = OthelloMCTS(board, player=player, model=model)
 
             # Initialize MCTS
-            searcher = MCTS(time_limit=mcts_max_iterations)
+            searcher = MCTS(time_limit=mcts_max_time,exploration_constant=mcts_exploration_constant)
 
             searcher.search(initial_state=initial_state)
 
@@ -133,7 +144,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
         [replay_buffer.add(s, a, r) for s, a, r in zip(states, action_probs_list, rewards)]
 
         if episode % simulations_between_training == 0 and episode is not start_episode:
-            print(f'Starting to train {epochs_for_batches} batches with size {batch_size} after {episode-start_episode+1} episodes. Buffer'
+            print(f'Starting to train for {epochs_for_batches} batches with batch-size {batch_size} after {episode-start_episode+1} episodes. Buffer'
                   f'has length {len(replay_buffer)}.')
 
             for i in range(epochs_for_batches):
@@ -174,18 +185,46 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
 
         # Create checkpoint
         if (episode + 1) % checkpoint_interval == 0:
-            save_checkpoint(model, optimizer, episode + 1)
-            replay_buffer.save_buffer('../../data/', 'replay_buffer_alphazero.pth')
+            save_checkpoint(model=model, optimizer=optimizer, episode=episode + 1)
+            replay_buffer.save_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_out)
 
 
 if __name__ == '__main__':
     # Load infrastructure
     board = OthelloBoard(8, 8)
-    model = AlphaZeroNet(8, 8)
-    model, episode = load_model('cp_alphazero_0.001_lr', model)
+    model = AlphaZeroNetWithResiduals(8, 8)
+    model, episode = load_model('cp_alphazero_residuals_0.001_lr', model)
     optimizer = Adam(model.parameters(), lr=0.001)
 
     # Train the model
     train_agent(board, model, optimizer, model_loaded=True, episode_loaded=episode,
-                checkpoint_interval=100, batch_size=32, epochs_for_batches=30,
-                mcts_max_iterations=5000, simulations_between_training=50)
+                checkpoint_interval=100, batch_size=32, epochs_for_batches=15,
+                mcts_max_time=1000, simulations_between_training=150,
+                mcts_exploration_constant=10, replay_buffer_in='replay_buffer_alphazero_5000ms_high_quality.pth',
+                replay_buffer_out='replay_buffer_alphazero.pth', replay_buffer_folder_path='../../data/')
+
+
+"""
+Folgender Plan:
+
+
+den aktuellen Buffer nach episode 100 separat abspeichern, weil high quality buffer.
+
+danach mcts_max_time reduzieren auf 1sec, aber nur 15 epochs trainieren weil schlechtere game quality
+adjust exploration rate von MCTS high für diese zeit. include warm-up period bis der buffer voll ist!
+
+after 1-2 days, reduce learning rate, reduce exploration rate, 
+
+
+Early Training (First 1000 Episodes):
+Batch size: 32 (current setting is fine).
+mcts_max_time: 1000–3000 ms (reduce for faster iteration).
+Simulations between training: 100–200.
+Epochs for batches: 10–20.
+
+Mid to Late Training (After 1000 Episodes):
+Batch size: 64 (if memory allows).
+mcts_max_time: 5000 ms (keep or increase for better search depth).
+Simulations between training: 50 (current setting is fine).
+Epochs for batches: 30–40.
+"""

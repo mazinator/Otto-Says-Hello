@@ -7,7 +7,14 @@ from src.utils.nn_helpers import *
 
 
 def save_checkpoint(model, optimizer, episode, path="../../.checkpoints"):
-    """Save a checkpoint of the model and optimizer."""
+    """
+    Save a checkpoint of the model and optimizer.
+
+    :param model:
+    :param optimizer:
+    :param episode:
+    :param path:
+    """
     if not os.path.exists(path):
         os.makedirs(path)  # Create directory if it doesn't exist
     checkpoint = {
@@ -17,7 +24,7 @@ def save_checkpoint(model, optimizer, episode, path="../../.checkpoints"):
         'learning_rate': optimizer.param_groups[0]['lr']
     }
     torch.save(checkpoint,
-               os.path.join(path, f"cp_alphazero_{optimizer.param_groups[0]['lr']}_lr_{episode}_episodes.pth"))
+               os.path.join(path, f"cp_alphazero_residuals_{optimizer.param_groups[0]['lr']}_lr_{episode}_episodes.pth"))
     print(f"Checkpoint saved for episode {episode}.")
 
 
@@ -25,17 +32,13 @@ def get_checkpoint(prefix, folder_path, episode_number=None):
     """
     Get the latest checkpoint file based on the highest episode number or a specific episode.
 
-    Args:
-        prefix (str): The prefix of the checkpoint file (e.g., "cp_alphazero_0.001_lr").
-        folder_path (str): The folder path to search for checkpoint files.
-        episode_number (int, optional): Specific episode number to search for. Default is None.
+    :param prefix: The prefix of the checkpoint file (e.g., "cp_alphazero_0.001_lr").
+    :param folder_path: The folder path to search for checkpoint files.
+    :param episode_number: Specific episode number to search for. Default is None.
 
-    Returns:
-        str: The path to the latest checkpoint file, or None if no matching file is found.
-        :param model_loaded:
+    :return: The path to the latest checkpoint file, or None if no matching file is found.
     """
     if not os.path.exists(folder_path):
-        #print(f"No pretrained model found under: {folder_path}. Starting from zero")
         return None
 
     # Pattern to extract episode numbers from filenames
@@ -65,6 +68,14 @@ def get_checkpoint(prefix, folder_path, episode_number=None):
 
 
 def load_model(prefix, model, folder_path='../../.checkpoints'):
+    """
+    Load a checkpoint of the model and optimizer if available.
+
+    :param prefix:
+    :param model:
+    :param folder_path:
+    :return:
+    """
     device = get_device()
 
     try:

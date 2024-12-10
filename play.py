@@ -1,3 +1,10 @@
+"""
+Script to play against an agent of your choice.
+
+IMPORTANT: do not change the field size! Leave it at 8x8, otherwise there will be errors with the neural net.
+"""
+
+
 import argparse
 from src.agents.simple_agents import *
 from src.agents.alpha_zero import *
@@ -34,8 +41,8 @@ def get_agent(args):
         return RandomAgent()
     elif agent_arg == 'alphazero':
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-        model = AlphaZeroNet(args.fieldSize, args.fieldSize).to(device)
-        checkpoint_path, episode_loaded = get_checkpoint('cp_alphazero_0.001_lr', '.checkpoints')
+        model = AlphaZeroNetWithResiduals(args.fieldSize, args.fieldSize).to(device)
+        checkpoint_path, episode_loaded = get_checkpoint('cp_alphazero__residuals_0.001_lr', '.checkpoints')
         if checkpoint_path:
             checkpoint = torch.load(checkpoint_path, map_location=device)
             model.load_state_dict(checkpoint['model_state_dict'])

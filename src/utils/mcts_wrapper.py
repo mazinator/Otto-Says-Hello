@@ -10,9 +10,16 @@ from src.utils.nn_helpers import prepare_alphazero_board_tensor, get_device
 
 class OthelloMCTS:
     def __init__(self, board, player, model=None):
+        """
+        Wrapper class to use the MCTS-package.
+
+        :param board: OthelloBoard
+        :param player: 0/1 (black/white
+        :param model: AlphaZeroNet or AlphaZeroNetWithResiduals
+        """
         self.board = board.copy()
         self.current_player = player
-        self.model = model  # AlphaZero neural network
+        self.model = model
 
     def get_current_player(self):
         return self.current_player
@@ -95,6 +102,13 @@ class OthelloMCTS:
 
 class Action():
     def __init__(self, player, x, y):
+        """
+        Class needed for wrapper-class.
+
+        :param player:
+        :param x:
+        :param y:
+        """
         self.player = player
         self.x = x
         self.y = y
@@ -110,19 +124,3 @@ class Action():
 
     def __hash__(self):
         return hash((self.x, self.y, self.player))
-
-if __name__ == "__main__":
-    # Initialize the AlphaZero model
-    device = get_device()
-    model = AlphaZeroNet(8, 8).to(device)
-
-    # Initialize the board and wrap it with MCTS
-    initial_state = OthelloMCTS(OthelloBoard(8, 8), model=model)
-
-    # Initialize MCTS
-    searcher = MCTS(time_limit=1000)
-
-    # Get the policy distribution from the AlphaZero model
-    policy_distribution = initial_state.get_policy_distribution()
-
-    print("Policy Distribution:", policy_distribution)

@@ -384,7 +384,7 @@ def run_replay_buffer_tests():
 
 
 if __name__ == "__main__":
-    #run_board_correctness_tests(run_excessive=False, print_boards=False, print_incomplete_boards=False)
-    #run_simple_agent_tests()
+    run_board_correctness_tests(run_excessive=False, print_boards=False, print_incomplete_boards=False)
+    run_simple_agent_tests()
     run_replay_buffer_tests()
     print("\n\nALL TESTS PASSED!")
