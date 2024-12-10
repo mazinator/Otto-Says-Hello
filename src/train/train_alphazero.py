@@ -190,18 +190,41 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
 
 
 if __name__ == '__main__':
-    # Load infrastructure
+
+    learning_rate = 0.001
+    learning_rate_load_from = 0.001
+
+    # Load Othello-Board
     board = OthelloBoard(8, 8)
+
+    # Load neural network model
     model = AlphaZeroNetWithResiduals(8, 8)
-    model, episode = load_model('cp_alphazero_residuals_0.001_lr', model)
-    optimizer = Adam(model.parameters(), lr=0.001)
+
+    # Try to retrieve past model with given learning rate
+    model, episode = load_model(f'cp_alphazero_residuals_{learning_rate_load_from}_lr', model)
+
+    # Set optimizer
+    optimizer = Adam(model.parameters(), lr=learning_rate)
+
+    # Multiple further (hyper)parameters needed for training
+    model_loaded = True
+    episode_loaded = episode
+    checkpoint_interval = 100
+    batch_size = 32
+    epochs_for_batches = 15
+    mcts_max_time = 1000
+    simulations_between_training = 150
+    mcts_exploration_constant = 10
+    replay_buffer_in = 'replay_buffer_alphazero_5000ms_high_quality.pth'
+    replay_buffer_out = 'replay_buffer_alphazero.pth'
+    replay_buffer_folder_path = '../../data/'
 
     # Train the model
-    train_agent(board, model, optimizer, model_loaded=True, episode_loaded=episode,
-                checkpoint_interval=100, batch_size=32, epochs_for_batches=15,
-                mcts_max_time=1000, simulations_between_training=150,
-                mcts_exploration_constant=10, replay_buffer_in='replay_buffer_alphazero_5000ms_high_quality.pth',
-                replay_buffer_out='replay_buffer_alphazero.pth', replay_buffer_folder_path='../../data/')
+    train_agent(board, model, optimizer, model_loaded=model_loaded, episode_loaded=episode_loaded,
+                checkpoint_interval=checkpoint_interval, batch_size=batch_size, epochs_for_batches=epochs_for_batches,
+                mcts_max_time=mcts_max_time, simulations_between_training=simulations_between_training,
+                mcts_exploration_constant=mcts_exploration_constant, replay_buffer_in=replay_buffer_in,
+                replay_buffer_out=replay_buffer_out, replay_buffer_folder_path=replay_buffer_folder_path)
 
 
 """

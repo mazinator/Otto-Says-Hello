@@ -10,8 +10,8 @@ class AlphaZeroNet(nn.Module):
         """
         Rather simple implementation without residual blocks, used in the beginning because it was easier to debug
 
-        :param rows: int
-        :param cols: int
+        :param rows: .
+        :param cols: .
         """
         super(AlphaZeroNet, self).__init__()
         self.rows = 8  # rows fixed currently!
