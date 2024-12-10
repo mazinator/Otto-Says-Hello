@@ -19,6 +19,7 @@ from src.agents.medium_agents import SimpleQLearningAgent
 OTHELLO_DATASET = "../../data/othello_dataset.csv"
 PATH_SIMPLE_Q_LEARNER = "../../models/simple_q_learner.json"
 
+
 def read_othello_dataset(path=OTHELLO_DATASET):
     othello_data = pd.read_csv(path)
     othello_data['game_moves'] = othello_data['game_moves'].apply(extract_moves_from_stream)
