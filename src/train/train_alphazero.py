@@ -215,7 +215,7 @@ if __name__ == '__main__':
     mcts_max_time = 1000
     simulations_between_training = 150
     mcts_exploration_constant = 10
-    replay_buffer_in = 'replay_buffer_alphazero_5000ms_high_quality.pth'
+    replay_buffer_in = 'replay_buffer_alphazero_5000.pth'
     replay_buffer_out = 'replay_buffer_alphazero.pth'
     replay_buffer_folder_path = '../../data/'
 
@@ -230,6 +230,7 @@ if __name__ == '__main__':
 """
 Folgender Plan:
 
+TODO vor submission 2: final error metrics eintragen in README
 
 den aktuellen Buffer nach episode 100 separat abspeichern, weil high quality buffer.
 
