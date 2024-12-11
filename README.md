@@ -44,9 +44,6 @@ However, three different approaches will be implemented:
 - train on human-generated games only
 - train on simulated games only
 - train on human-generated games, afterwards on simulated ones
-- 
-(Update from future me: human-generated data is not necessary for the AlphaZero architecture as it learns from simulated games only. A 
-corresponding stream-reader and replay buffer and is implemented however.)
 
 
 ## Work-packages
@@ -55,8 +52,7 @@ corresponding stream-reader and replay buffer and is implemented however.)
   a lot of content on YouTube, so probably way more than 10 hours(
 - Set up infrastructure (originally intended: 15h. Actually: creating the board, a lot of tests and a few simple baseline agents took around 15 hours)
 - Implement SOFA (Q-learning) (originally intended: 15h. Completely skipped that part, as those architecture were too expensive for my computer)
-- Implement the approaches mentioned above (originally intended: 10h each. Took me around 5h to implement a replay buffer from existing games, however 
-  never really used because alpha zero, the only architecture I have implemented is not based on a replay buffer but on Monte Carlo Tree Search)
+- Implement the approaches mentioned above (originally intended: 10h each. Decided against separate approaches, took around 10 hours)
 - Finetune Neural Net, try out different architectures (intended: 35h. Did not try out different architectures but definitely more than 35h)
 - Debugging (not planned originally. More on the section below on 'How this project turned out')
 - Implementation of MCTS (not planned originally. Lost a day on a somewhat efficient implementation before realizing that there are MCTS-packages available)
@@ -147,19 +143,19 @@ The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
 
 It can be split up into the following parts:
 
-$(z-v)^2$: this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing 
+$(z-v)^2$: value loss. this term measures the error between the predicted game outcome (v) and the actual game outcome (z). It is basically an MSE which is pushing 
 the neural network towards accurately predicting game outcomes.
 
-$-\pi^T*log(p)$: This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo 
+$-\pi^T*log(p)$: policy loss. This term measures the divergence between the predicted move probabilities (p) and the improved policy $\pi$ derived from Monte Carlo 
 Tree Search. This part based on negative log-likelihood pushes the networks predicted move towards the improved policy.
 
-$\lVert\theta\rVert^2$: the L2-regularization term penalizes large weights in the neural network, which as far as I understand is especially important 
+$\lVert\theta\rVert^2$: regularization. the L2-regularization term penalizes large weights in the neural network, which as far as I understand is especially important 
 in such a small network.
 
 It is a little hard to define an expected loss beforehand for an error metric which is composed of 3 different parts with different natures, this was my
 best initial estimate:
 
-1. $(z-v)^2$ should be expected to fall under 0.01
+1. $(z-v)^2$ should be expected to fall under 0.01 
 2. $-\pi^T*log(p)$ can be expected to be at around 0.5
 3. $\lVert\theta\rVert^2$ is hard to estimate; I found suggestions of it being around 5% of the combined value and policy loss.
 
@@ -168,7 +164,12 @@ naturally be very low rather quickly and does not play a role afterwards. The re
 if some very big parameters are derived from the optimizer. So the biggest chunk of the work goes to pushing the network towards
 the improved policy, which makes sense at least on an abstract level.
 
-Actually achieved error metric: TODO write final result
+A few weeks later. Actually achieved error metric: 
+
+- value loss fell under 0.00001
+- policy loss stayed constant at around 1.7 to 2.3 (but at a stage where the policy tensor was 1-hot-encoded from eOthello games, 
+  not a probability distribution from MCTS, so makes sense that there is no better fit)
+- regularization loss stayed constant at around 0.1 to 0.2
 
 
 ## A few remarks every now and then regarding my progress.
@@ -204,6 +205,9 @@ Actually achieved error metric: TODO write final result
 - I think I fixed it :) It is really amazing how robust and forgiving neural networks can be - I have no idea why the shit that I called 'code' produced anything
   meaningful at all. Always triple check dimensions and intermediate results. (09.12.2024)
 - Looks good. (10.12.2024)
+- I fitted around 100 batches of size 32 with rather low quality MCTS-simulations (only around 80 simulations per state) and almost lost against the agent, 
+  it definitely something meaningful. (10.12.2024)
+- Trained the model on the 25.000 games from eOthello (game from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me easily. (11.12.2024)
 
 
 # How this project turned out
@@ -222,7 +226,8 @@ Overall, I still feel like it was a great project:
 
 * I learned a lot about constructing good test cases,
 * I was able to strengthen my experience in reinforcement learning,
-* I learned a lot about neural networks (especially how to effectively handle the dimension and debugging them, but also on tuning hyperparameters),
+* I learned a lot about neural networks (especially how to effectively handle the dimension and debugging them, but also 
+  on tuning hyperparameters and how I can find better hyperparameters),
 * I had a lot of fun playing and experimenting in my environment, 
 * and I played a ton of Othello games which was also fun.
 

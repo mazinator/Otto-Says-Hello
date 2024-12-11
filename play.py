@@ -10,11 +10,14 @@ from src.agents.simple_agents import *
 from src.agents.alpha_zero import *
 from src.environment.board import *
 
+# Note: CUT STARTING AT episodes!
+BEST_MODEL = 'cp_alphazero_residuals_humanplayed_0.001_lr'
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--opponent',
-                        default='maxMove',
+                        default='alphazero',
                         choices=['maxMove', 'minMove', 'randomMove', 'alphazero'],
                         help='Selection of opposing agent')
     parser.add_argument('--colorOwn',
@@ -40,13 +43,15 @@ def get_agent(args):
     elif agent_arg == 'randomMove':
         return RandomAgent()
     elif agent_arg == 'alphazero':
-        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        device = get_device()
         model = AlphaZeroNetWithResiduals(args.fieldSize, args.fieldSize).to(device)
-        checkpoint_path, episode_loaded = get_checkpoint('cp_alphazero__residuals_0.001_lr', '.checkpoints')
+        checkpoint_path, episode_loaded = get_checkpoint(BEST_MODEL, '.checkpoints')
         if checkpoint_path:
             checkpoint = torch.load(checkpoint_path, map_location=device)
             model.load_state_dict(checkpoint['model_state_dict'])
-            print(f"Loaded AlphaZero model from episode {checkpoint['episode']}")
+            print(f"Loaded AlphaZero model from episode {checkpoint['episode']} (prefix was {BEST_MODEL})")
+        else:
+            raise ValueError('error loading a trained model!')
         return model
 
 

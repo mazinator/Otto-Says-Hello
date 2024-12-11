@@ -19,15 +19,21 @@ from collections import deque
 import numpy as np
 import json, os
 
+from mcts.searcher.mcts import MCTS
+
+from src.agents.alpha_zero import AlphaZeroNetWithResiduals
 from src.environment.board import OthelloBoard
 from src.utils.data_loader import read_othello_dataset
 from pathlib import Path
+
+from src.utils.mcts_wrapper import OthelloMCTS
+from src.utils.nn_helpers import get_device
 
 OUT_FILE = 'data/replay_buffer.json'
 
 
 class ReplayBuffer:
-    def __init__(self, capacity=2000000):
+    def __init__(self, capacity=40000):
         """
         Initialize the replay buffer.
 
@@ -126,7 +132,7 @@ class ReplayBufferAlphaZero:
              reward) for state, target_policy, reward in self.buffer
         ]
         torch.save(buffer_list, file_path)
-        print(f"Saved buffer to {file_path}.")
+        print(f"Saved buffer to {file_path} with size {len(buffer_list)}.")
 
     def load_buffer(self, folder_path, filename):
         """
@@ -152,7 +158,7 @@ class ReplayBufferAlphaZero:
             print(f"Error loading buffer from {file_path}. Exception: {e}. Starting with empty buffer.")
 
 
-def create_and_store_replay_buffer(output_file=OUT_FILE):
+def create_and_store_replay_buffer_from_human_played_games(output_file=OUT_FILE):
     """
     Create a replay buffer from the Othello dataset.
 
@@ -162,60 +168,54 @@ def create_and_store_replay_buffer(output_file=OUT_FILE):
     """
     othello_data = read_othello_dataset()
 
+    replay_buffer = ReplayBufferAlphaZero(capacity=2000000)
+
     experiences = []
+    board = OthelloBoard(rows=8, cols=8)
 
     for idx, game in othello_data.iterrows():
 
-        board = OthelloBoard(rows=8, cols=8)
-        moves = game['game_moves']
+        board.reset_board()
 
-        if idx % 200 == 0 and idx != 0:
+        game_actions = game['game_moves']
+
+        if idx % 100 == 0 and idx != 0:
             print(f'Processed {idx} games ...')
 
-        for i, move in enumerate(moves):
-            state = board.board.tolist()
+        states, rewards, action_probs_list, players_list = [], [], [], []
+
+        for i, move in enumerate(game_actions):
+
             player = board.next_player
 
-            # Parse and execute move
-            action = (ord(move[0]) - ord('A'), int(move[1]) - 1)
-            next_player, next_board, valid_actions, winner = board.make_action(action, player)
-
-            # Check reward
-            reward = 0
-            if i == len(moves) - 1:
-                if winner == -1:
-                    reward = 1 if player == 0 else -1
-                elif winner == -2:
-                    reward = 1 if player == 1 else -1
-                elif winner == -3:
-                    reward = 0.5
-
-            winner_found = winner != 0
-
-            # Store experience as a dictionary
-            experiences.append({
-                "state": state,
-                "action": action,
-                "reward": reward,
-                "next_state": next_board.tolist(),
-                "done": winner_found
-            })
-
-            if winner_found:
+            # If no valid actions available, set the rewards of all actions for the played game
+            if len(board.get_valid_actions(player)) == 0:
+                winner = board.check_winner()  # Determine the winner
+                if winner == -1:  # Black wins
+                    rewards = [1 if p == 0 else -1 for p in players_list]
+                elif winner == -2:  # White wins
+                    rewards = [1 if p == 1 else -1 for p in players_list]
+                elif winner == -3:  # Draw
+                    rewards = [0 for _ in players_list]
                 break
 
-    # Check if file exists, otherwise create
-    if not Path(OUT_FILE).exists():
-        Path(OUT_FILE).touch()
-    else:
-        Path(OUT_FILE).unlink()
-        Path(OUT_FILE).touch()\
+            action = (ord(move[0]) - ord('A'), int(move[1]) - 1)
+            
+            action_one_hot_encoded = np.zeros((64,), dtype=np.float32)
+            action_one_hot_encoded[action[0] * 8 + action[1]] = 1.0
 
-    # Save all experiences to the output file
-    with open(output_file, 'w') as f:
-        json.dump(experiences, f)
+            players_list.append(player)
 
-    print(f"Saved {len(experiences)} experiences to {output_file}.")
+            states.append(board.board.copy())
+            action_probs_list.append(action_one_hot_encoded.reshape(64))
+
+            rewards.append(0)
+
+            player, _, _, _ = board.make_action(action, player)
+
+        [replay_buffer.add(s, a, r) for s, a, r in zip(states, action_probs_list, rewards)]
+
+    replay_buffer.save_buffer(folder_path='../../data', filename='replay_buffer_human.pth')
 
 
 def load_replay_buffer(input_file=OUT_FILE, limit=float('inf')):
@@ -252,3 +252,7 @@ def load_replay_buffer(input_file=OUT_FILE, limit=float('inf')):
         print(f"Input file {input_file} does not exist.")
 
     return replay_buffer
+
+
+if __name__ == '__main__':
+    create_and_store_replay_buffer_from_human_played_games()

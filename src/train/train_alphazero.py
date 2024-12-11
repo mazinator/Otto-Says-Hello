@@ -45,10 +45,12 @@ def display_timer(start_time):
 def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, checkpoint_interval=500,
                 model_loaded=False, episode_loaded=None, c=10e-4, simulations_between_training=50,
                 epochs_for_batches=20, mcts_max_time=1000, mcts_exploration_constant = math.sqrt(2),
-                replay_buffer_in=None, replay_buffer_out=None, replay_buffer_folder_path=None) -> None:
+                replay_buffer_in=None, replay_buffer_out=None, replay_buffer_folder_path=None,
+                mcts_only=False, model_file_out_prefix=None, buffer_capacity=40000) -> None:
     """
     Trains an agent on selfplay.
 
+    :param buffer_capacity:
     :param board: OthelloBoard, currently MUST be an 8x8 board
     :param model: Either AlphaZeroNet or AlphaZeroNetWithResiduals
     :param optimizer: .
@@ -65,13 +67,21 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
     :param replay_buffer_in:
     :param replay_buffer_out:
     :param replay_buffer_folder_path:
+    :param mcts_only:
     """
+    if model_file_out_prefix is None:
+        raise ValueError(f'{model_file_out_prefix} is not defined')
 
-    replay_buffer = ReplayBufferAlphaZero()
+    replay_buffer = ReplayBufferAlphaZero(capacity=buffer_capacity)
     replay_buffer.load_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_in)
 
     timer_thread = threading.Thread(target=display_timer, args=(time.time(),), daemon=True)
     timer_thread.start()
+
+    if mcts_only:
+        print('\033[31mATTENTION: MCTS ONLY! Model will not be trained, only the ReplayBuffer will be filled and '
+              'stored!\033[0m')
+
 
 
     model.to(device)
@@ -143,11 +153,14 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
         # Add experience from the played round into the replay buffer
         [replay_buffer.add(s, a, r) for s, a, r in zip(states, action_probs_list, rewards)]
 
-        if episode % simulations_between_training == 0 and episode is not start_episode:
+        if episode % simulations_between_training == 0 and episode is not start_episode and not mcts_only:
             print(f'Starting to train for {epochs_for_batches} batches with batch-size {batch_size} after {episode-start_episode+1} episodes. Buffer'
                   f'has length {len(replay_buffer)}.')
 
             for i in range(epochs_for_batches):
+
+                if i % 100 == 0:
+                    print(f'Training episode: {i} of {epochs_for_batches}..')
 
                 # Train the model using batches
                 batch = replay_buffer.sample(batch_size)
@@ -185,9 +198,13 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
 
         # Create checkpoint
         if (episode + 1) % checkpoint_interval == 0:
-            save_checkpoint(model=model, optimizer=optimizer, episode=episode + 1)
-            replay_buffer.save_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_out)
+            model_file_out_name = f"{model_file_out_prefix}_{episode}_episodes.pth"
+            save_checkpoint(model=model, optimizer=optimizer, episode=episode + 1, file_name=model_file_out_name) if mcts_only is not None else print('model NOT saved!')
+            replay_buffer.save_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_out) if replay_buffer_out is not None else print('replay buffer NOT saved!')
 
+    model_file_out_name = f"{model_file_out_prefix}_{episodes}_episodes.pth"
+    save_checkpoint(model=model, optimizer=optimizer, episode=episodes + 1, file_name=model_file_out_name) if mcts_only is not None else print('model NOT saved!')
+    replay_buffer.save_buffer(folder_path=replay_buffer_folder_path, filename=replay_buffer_out) if replay_buffer_out is not None else print('replay buffer NOT saved!')
 
 if __name__ == '__main__':
 
@@ -201,7 +218,8 @@ if __name__ == '__main__':
     model = AlphaZeroNetWithResiduals(8, 8)
 
     # Try to retrieve past model with given learning rate
-    model, episode = load_model(f'cp_alphazero_residuals_{learning_rate_load_from}_lr', model)
+    model_load_prefix = f'cp_alphazero_residuals_{learning_rate_load_from}_lr'
+    model, episode = load_model(model_load_prefix, model)
 
     # Set optimizer
     optimizer = Adam(model.parameters(), lr=learning_rate)
@@ -209,22 +227,26 @@ if __name__ == '__main__':
     # Multiple further (hyper)parameters needed for training
     model_loaded = True
     episode_loaded = episode
-    checkpoint_interval = 100
-    batch_size = 32
-    epochs_for_batches = 15
+    checkpoint_interval = 1000#151
+    batch_size = 64#32
+    epochs_for_batches = 15000#15
     mcts_max_time = 1000
-    simulations_between_training = 150
+    simulations_between_training = 1#150
     mcts_exploration_constant = 10
-    replay_buffer_in = 'replay_buffer_alphazero_5000.pth'
-    replay_buffer_out = 'replay_buffer_alphazero.pth'
+    replay_buffer_in = 'replay_buffer_human.pth'#'replay_buffer_alphazero.pth'
+    replay_buffer_out = None #'replay_buffer_alphazero.pth'
     replay_buffer_folder_path = '../../data/'
+    model_file_out_prefix = f"cp_alphazero_residuals_humanplayed_{optimizer.param_groups[0]['lr']}_lr"
+    episode = episode + 2#sys.maxsize
+    buffer_capacity = 2000000#40000
 
     # Train the model
     train_agent(board, model, optimizer, model_loaded=model_loaded, episode_loaded=episode_loaded,
                 checkpoint_interval=checkpoint_interval, batch_size=batch_size, epochs_for_batches=epochs_for_batches,
                 mcts_max_time=mcts_max_time, simulations_between_training=simulations_between_training,
                 mcts_exploration_constant=mcts_exploration_constant, replay_buffer_in=replay_buffer_in,
-                replay_buffer_out=replay_buffer_out, replay_buffer_folder_path=replay_buffer_folder_path)
+                replay_buffer_out=replay_buffer_out, replay_buffer_folder_path=replay_buffer_folder_path,
+                model_file_out_prefix=model_file_out_prefix, episodes=episode, buffer_capacity=buffer_capacity)
 
 
 """

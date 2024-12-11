@@ -6,17 +6,17 @@ from src.agents.alpha_zero import *
 from src.utils.nn_helpers import *
 
 
-def save_checkpoint(model, optimizer, episode, path="../../.checkpoints"):
+def save_checkpoint(model, optimizer, episode, folder_path="../../.checkpoints", file_name=None):
     """
     Save a checkpoint of the model and optimizer.
 
     :param model:
     :param optimizer:
     :param episode:
-    :param path:
+    :param folder_path:
     """
-    if not os.path.exists(path):
-        os.makedirs(path)  # Create directory if it doesn't exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)  # Create directory if it doesn't exist
     checkpoint = {
         'episode': episode,
         'model_state_dict': model.state_dict(),
@@ -24,7 +24,7 @@ def save_checkpoint(model, optimizer, episode, path="../../.checkpoints"):
         'learning_rate': optimizer.param_groups[0]['lr']
     }
     torch.save(checkpoint,
-               os.path.join(path, f"cp_alphazero_residuals_{optimizer.param_groups[0]['lr']}_lr_{episode}_episodes.pth"))
+               os.path.join(folder_path, file_name))
     print(f"Checkpoint saved for episode {episode}.")
 
 

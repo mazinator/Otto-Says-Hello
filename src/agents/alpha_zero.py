@@ -149,3 +149,13 @@ class AlphaZeroNetWithResiduals(nn.Module):
         v = torch.tanh(self.value_fc2(v))
 
         return p, v
+
+    def get_action(self, player, board):
+
+        print(f"AlphaZero ({['black', 'white'][player]}) is thinking...")
+        board_tensor = prepare_alphazero_board_tensor(board.board, player)
+        with torch.no_grad():
+            policy, _ = self.forward(board_tensor)
+        valid_moves = board.get_valid_actions(player)
+        move_probs = torch.exp(policy).cpu().numpy().flatten()
+        return max(valid_moves, key=lambda mv: move_probs[mv[0] * board.cols + mv[1]])

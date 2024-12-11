@@ -35,7 +35,7 @@ from src.agents.simple_agents import RandomAgent, MinAgent, MaxAgent
 from src.environment.board import OthelloBoard
 from src.utils.data_loader import read_othello_dataset, store_q_agent, load_q_agent
 from src.utils.agent_vs_agent_simulation import simulate_agent_vs_agent
-from src.environment.replay_buffer import create_and_store_replay_buffer
+from src.environment.replay_buffer import create_and_store_replay_buffer_from_human_played_games
 import string, random, time
 from pathlib import Path
 
@@ -375,7 +375,7 @@ def play_random_game(cols=6, rows=6, print_board=False, current_player=0, print_
 
 def run_replay_buffer_tests():
     print('checking out if I can read use the replay buffer..')
-    create_and_store_replay_buffer()
+    create_and_store_replay_buffer_from_human_played_games()
     print('processed all games, checking if file exists .. ')
     buffer_file = Path('../../data/replay_buffer.json')
 

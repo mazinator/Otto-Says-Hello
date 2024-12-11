@@ -1,11 +1,10 @@
 from __future__ import division
 from mcts.searcher.mcts import MCTS
+from torch.optim import Adam
 
-from src.agents.alpha_zero import AlphaZeroNet
-from src.environment.board import OthelloBoard
 import torch
 
-from src.utils.nn_helpers import prepare_alphazero_board_tensor, get_device
+from src.utils.nn_helpers import prepare_alphazero_board_tensor
 
 
 class OthelloMCTS:
@@ -99,6 +98,7 @@ class OthelloMCTS:
             masked_probs /= total_prob
 
         return masked_probs
+
 
 class Action():
     def __init__(self, player, x, y):
