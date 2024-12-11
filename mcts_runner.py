@@ -20,7 +20,7 @@ if __name__ == '__main__':
     model = AlphaZeroNetWithResiduals(8, 8)
 
     # Try to retrieve past model with given learning rate
-    model, episode = load_model(f'cp_alphazero_residuals_{learning_rate_load_from}_lr', model)
+    model, episode = load_model(f'cp_alphazero_residuals_{learning_rate_load_from}_lr', model, folder_path='.checkpoints')
 
     # Set optimizer
     optimizer = Adam(model.parameters(), lr=learning_rate)
@@ -28,15 +28,15 @@ if __name__ == '__main__':
     # Multiple further (hyper)parameters needed for training
     model_loaded = True
     episode_loaded = episode
-    checkpoint_interval = 20
+    checkpoint_interval = 5
     batch_size = 32
     epochs_for_batches = 15
-    mcts_max_time = 5000
+    mcts_max_time = 6000
     simulations_between_training = 150
-    mcts_exploration_constant = 4
+    mcts_exploration_constant = math.sqrt(2)
     replay_buffer_in = 'replay_buffer_alphazero_5000.pth'
     replay_buffer_out = 'replay_buffer_alphazero_5000.pth'
-    replay_buffer_folder_path = '../../data/'
+    replay_buffer_folder_path = 'data/'
     mcts_only = True
 
     train_agent(board, model, optimizer, model_loaded=model_loaded, episode_loaded=episode_loaded,

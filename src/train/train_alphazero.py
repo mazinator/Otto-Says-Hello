@@ -69,7 +69,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
     :param replay_buffer_folder_path:
     :param mcts_only:
     """
-    if model_file_out_prefix is None:
+    if model_file_out_prefix is None and not mcts_only:
         raise ValueError(f'{model_file_out_prefix} is not defined')
 
     replay_buffer = ReplayBufferAlphaZero(capacity=buffer_capacity)
