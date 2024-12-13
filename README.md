@@ -207,7 +207,7 @@ A few weeks later. Actually achieved error metric:
 - Looks good. (10.12.2024)
 - I fitted around 100 batches of size 32 with rather low quality MCTS-simulations (only around 80 simulations per state) and almost lost against the agent, 
   it definitely something meaningful. (10.12.2024)
-- Trained the model on the 25.000 games from eOthello (game from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me easily. (11.12.2024)
+- Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me easily. (11.12.2024)
 
 
 # How this project turned out
