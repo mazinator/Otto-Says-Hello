@@ -228,8 +228,12 @@ A few weeks later. Actually achieved error metric:
   3. Starting from the conquered corner, flip all stones nearby to own color and ignore the rest of the field. Once a corner is conquered, it cannot be flipped anymore
      by the opponent. By flipping the stones next to that corner, more and more stones become unflippable for the opponent, leading to a slow but sure win.
   
-  - I have tried out various different tactics playing against the Alpha Zero Agent, and with this 3-step-plan I basically never lost. Different tactics led to the AlphaZeroAgent
-    having the edge. That opinion is rather difficult to evaluate, because one could argue that I probably have played worse than I could have. However, one pattern 
+- I have tried out various different tactics playing against the Alpha Zero Agent, and with this 3-step-plan I basically never lost. Different tactics led to the AlphaZeroAgent
+  having the edge. That opinion is rather difficult to evaluate, because one could argue that I probably have played worse than I could have. However, a clear pattern 
+  emerges in my opinion: The model knows that walls and especially the corners are very important, however after 1 to 4 moves of trying to push it into a bad move it 
+  does perform that move. Also in total, it plays very smart. I therefore conclude that 1. Investing more resources into simulations would be very beneficial and 2.
+  additionally, one could emphasize such situations more in the training data by simulating such situations and training the model further on such situations (which
+  undermines the original thought of the architecture if not doing any handcrafted features, but would lead to less simulations necessary).
     
 
 
@@ -237,14 +241,14 @@ A few weeks later. Actually achieved error metric:
 
 Quick ragequit about myself:
 The magnitude of how much I underestimated the work necessary to reach my original goals is laughable. They maybe would have been somewhat realistic if it was my 5th 
-reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the alpha zero architecture mid-november, the 
-level of research and learning I had just on the topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based 
+reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the AlphaZero part mid-november, the 
+level of research and learning I had just on the topic of reinforcement learning was rather unexpected given that I already had a solid theoretical background based 
 on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) book. For example, I spent 2-3 hours in understanding the MuZero architecture before realising that it is an overkill for problems without 
 hidden states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
-resources for most of them. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
-and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
+resources for a lot of them. I had a lot of long nights and weekends on this topic, read papers, watched videos, and in the end I'm just happy that I learned a lot and 
+have at least one solid agent based on the original AlphaZero architecture.
 
-Overall, I still feel like it was a good experience:
+Overall, I feel like it was a good experience:
 
 
 * I learned a lot about constructing good test cases,
@@ -253,6 +257,7 @@ Overall, I still feel like it was a good experience:
   on tuning hyperparameters and how I can find better hyperparameters),
 * I had a lot of fun playing and experimenting in my environment, 
 * and I played a ton of Othello games which was also fun.
+* (I also learned that no one seems to know this game)
 
 # Conclusion
 
