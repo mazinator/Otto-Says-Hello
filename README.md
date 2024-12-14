@@ -164,12 +164,16 @@ naturally be very low rather quickly and does not play a role afterwards. The re
 if some very big parameters are derived from the optimizer. So the biggest chunk of the work goes to pushing the network towards
 the improved policy, which makes sense at least on an abstract level.
 
-A few weeks later. Actually achieved error metric: 
+(A few weeks later..) Actually achieved error metric: 
 
 - value loss fell under 0.00001
 - policy loss stayed constant at around 1.7 to 2.3 (but at a stage where the policy tensor was 1-hot-encoded from eOthello games, 
   not a probability distribution from MCTS, so makes sense that there is no better fit)
 - regularization loss stayed constant at around 0.1 to 0.2
+
+The error metrics above are from the human played games (where the value distribution is 1-hot-encoded, and not a probability distribution
+like when creating the value distribution from MCTS) for a batch size of 32. When training on MCTS-simulations, that value quickly fell under
+0.2 for the same batch size. This means that fitting to a probability distribution is far more easy for the model than for a 1-hot-encoding (makes sense..)
 
 
 ## A few remarks every now and then regarding my progress.
