@@ -133,11 +133,10 @@ Quick list of the parameters to set in train_agent() function:
 ### Error metric
 
 I have done a lot of research on error metrics for reinforcement learning, and my final conclusion is that it makes no sense to use a different 
-metric for the AlphaZero-architecture. For neural networks, there is no one-size-fits-all solution; my feeling is that this is even more the
-case for reinforcement learning. Also, I did not find a lot of research on the various impacts of different error metrics for different architectures
-in this area. Trying out multiple different error metrics was just not possible given the time I needed to train a single model on my laptop.
-I also assume that authors of such papers which did have such resources used the error metric which worked the best. The arguments above were enough
-for me to proceed with the original error metric provided by the authors.
+metric for the AlphaZero-architecture. For neural networks, there is no one-size-fits-all solution Also, I did not find a lot of research on the various 
+impacts of different error metrics for different architectures in this area. Trying out multiple different error metrics was just not possible given the 
+time I needed to train a single model on my laptop. I also assume that authors of such papers which did have such resources used the error metric which 
+worked the best. The arguments above were enough for me to proceed with the original error metric provided by the authors.
 
 The loss function is defined as: $L=(z-v)^2-\pi^T*log(p)+\lVert\theta\rVert^2$
 
@@ -171,8 +170,8 @@ the improved policy, which makes sense at least on an abstract level.
   not a probability distribution from MCTS, so makes sense that there is no better fit)
 - regularization loss stayed constant at around 0.1 to 0.2
 
-The error metrics above are from the human played games (where the value distribution is 1-hot-encoded, and not a probability distribution
-like when creating the value distribution from MCTS) for a batch size of 32. When training on MCTS-simulations, that value quickly fell under
+The error metrics above are from the human played games (where the policy distribution is 1-hot-encoded, and not a probability distribution
+like when creating the policy distribution from MCTS) for a batch size of 32. When training on MCTS-simulations, that value quickly fell under
 0.2 for the same batch size. This means that fitting to a probability distribution is far more easy for the model than for a 1-hot-encoding (makes sense..)
 
 
@@ -211,8 +210,7 @@ like when creating the value distribution from MCTS) for a batch size of 32. Whe
 - Looks good. (10.12.2024)
 - I fitted around 100 batches of size 32 with rather low quality MCTS-simulations (only around 80 simulations per state) and almost lost against the agent, 
   it definitely something meaningful. (10.12.2024)
-- Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me in 
-  most of the cases. (11.12.2024)
+- Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It is able to beat me in some cases. (11.12.2024)
 - Over the past 5 days and around 120 hours of total simulation time, I have created a ReplayBuffer with the most qualitative simulations I can afford with my 
   laptop (around 600 simulations per state). There are currently 51000 samples in the ReplayBuffer, the final hour has come. The model will now be trained with 
   a decaying learning rate. (14.12.2024)
@@ -224,7 +222,7 @@ like when creating the value distribution from MCTS) for a batch size of 32. Whe
 - It seems that the 1-hot-encoded human played games cannot be used reasonably in combination with the ReplayBuffer. I have tuned the hyperparameters in a lot of 
   different ways; however, it seems that with the 1-hot-encoding, the model is stuck in a suboptimal hyperplane and does not recover. I have therefore started
   training from scratch on the already mentioned high quality ReplayBuffer and use this as a final model (14.12.2024)
-- While I do see a lot of progress in terms of game smartness, Othello is a game where 1 or 2 wrong moves at a wrong time make the long term difference. A tactic
+- While I do see a lot of progress in terms of game smartness, Othello is a game where 1 wrong move can make the long term difference. A tactic
   that I regularly use against this bot is by pursuing 3 goals sequentially: 
   1. Be the first to reach a wall, fight for wall dominance at all costs, 
   2. after establishing wall dominance, push towards the next corner but avoid setting a next-to-corner stone at all costs (for top left corner, this would be 
@@ -232,10 +230,10 @@ like when creating the value distribution from MCTS) for a batch size of 32. Whe
   3. Starting from the conquered corner, flip all stones nearby to own color and ignore the rest of the field. Once a corner is conquered, it cannot be flipped anymore
      by the opponent. By flipping the stones next to that corner, more and more stones become unflippable for the opponent, leading to a slow but sure win.
   
-- I have tried out various different tactics playing against the Alpha Zero Agent, and with this 3-step-plan I basically never lost. Different tactics led to the AlphaZeroAgent
-  having the edge. That opinion is rather difficult to evaluate, because one could argue that I probably have played worse than I could have. However, a clear pattern 
-  emerges in my opinion: The model knows that walls and especially the corners are very important, however after 1 to 4 moves of trying to push it into a bad move it 
-  does perform that move. Also in total, it plays very smart. I therefore conclude that 1. Investing more resources into simulations would be very beneficial and 2.
+  I have tried out various different tactics playing against the Alpha Zero Agent, and with this 3-step-plan I basically never lost. Other tactics led to the AlphaZeroAgent
+  having the edge. That statement is however rather difficult to evaluate, because one could argue that I probably have played worse than I could have. However, a clear pattern 
+  emerges in my opinion: The model 'knows' that walls and especially the corners are very important, however after 1 to 4 moves of trying to push it into a bad move it 
+  does perform that killing move. Also in total, it plays very smart. I therefore conclude that 1. Investing more resources into simulations would be very beneficial and 2.
   additionally, one could emphasize such situations more in the training data by simulating such situations and training the model further on such situations (which
   undermines the original thought of the architecture if not doing any handcrafted features, but would lead to less simulations necessary).
     
@@ -243,7 +241,6 @@ like when creating the value distribution from MCTS) for a batch size of 32. Whe
 
 # How this project turned out
 
-Quick ragequit about myself:
 The magnitude of how much I underestimated the work necessary to reach my original goals is laughable. They maybe would have been somewhat realistic if it was my 5th 
 reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the AlphaZero part mid-november, the 
 level of research and learning I had just on the topic of reinforcement learning was rather unexpected given that I already had a solid theoretical background based 
