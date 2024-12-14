@@ -60,6 +60,8 @@ However, three different approaches will be implemented:
 
 ![Me three weeks after writing all that stuff above](pic.jpg)
 
+Me three weeks after writing all that stuff above.
+
 ### File descriptions
 
 While there should be enough documentation inside the files, here is a high level description of the various files:
