@@ -196,7 +196,8 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
                 loss.backward()
                 optimizer.step()
 
-                if i > 10000:  # Example: change learning rate at epoch 5
+                # Change learning rate after 25000 episodes every 100 episodes
+                if i > 25000 and i % 100 == 0:
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = param_group['lr'] * lr_decay
                     print(f"Learning rate changed to {param_group['lr']}")
@@ -213,7 +214,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
 
 if __name__ == '__main__':
 
-    learning_rate = 0.005
+    learning_rate = 0.001
     learning_rate_load_from = 0.001
 
     # Load Othello-Board
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     model = AlphaZeroNetWithResiduals(8, 8)
 
     # Try to retrieve past model with given learning rate
-    model_load_prefix = f'cp_alphazero_residuals_humanplayed_{learning_rate_load_from}_lr'
+    model_load_prefix = f'cp_alphazero_residuals_{learning_rate_load_from}_lr'
     model, episode = load_model(model_load_prefix, model)
 
     # Set optimizer
@@ -234,7 +235,7 @@ if __name__ == '__main__':
     episode_loaded = episode
     checkpoint_interval = 1#151
     batch_size = 32
-    epochs_for_batches = 15000#15
+    epochs_for_batches = 55000#15
     mcts_max_time = 100
     simulations_between_training = 1#150
     mcts_exploration_constant = 10

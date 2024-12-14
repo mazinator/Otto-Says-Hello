@@ -209,14 +209,28 @@ A few weeks later. Actually achieved error metric:
   it definitely something meaningful. (10.12.2024)
 - Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me in 
   most of the cases. (11.12.2024)
-- Over the past 5 days and around 120 hours of total simulation time, I have created a rather sophisticated ReplayBuffer with the most qualitative simulations I can
-  afford with my laptop. There are currently 51000 samples in the ReplayBuffer, the final hour has come. The model will now be trained with a decaying learning rate. 
-  (14.12.2024)
+- Over the past 5 days and around 120 hours of total simulation time, I have created a ReplayBuffer with the most qualitative simulations I can afford with my 
+  laptop (around 600 simulations per state). There are currently 51000 samples in the ReplayBuffer, the final hour has come. The model will now be trained with 
+  a decaying learning rate. (14.12.2024)
 - I am not sure however how the fact that I used 1-hot-encoded games from humans as a kickstart will influence the training. The problem is that my initially learned
-  value function was probably fitted to a straightforward 'decision' instead of a distribution. I stopped the human-based training with a value loss of around 0.001,
-  now I have a value of around 32, indicating exactly what I just have stated. To counteract this, I will start with a very high learning rate, which decays for quite 
-  a while. Combining this with a lot of episodes, this should lead to a shameless overfit on the training data. However, I would argue that overfitting is not an issue
-  here. Ideally, all relevant board states are already in the training data, so there is 'nothing new' I would argue. 
+  value function was probably fitted to a straightforward 'decision' instead of a distribution. I stopped the human-based training with a value loss of around 1.9,
+  now I have a value of around 32 (basically batch size), indicating exactly what I just have stated. To counteract this, I will start with a very high learning rate, 
+  which decays for quite a while. Combining this with a lot of episodes, this should lead to a shameless overfit on the training data. However, I would argue that  
+  overfitting is not an issue here. Ideally, all relevant board states are already in the training data, so there is 'nothing new' I would argue. (14.12.2024)
+- It seems that the 1-hot-encoded human played games cannot be used reasonably in combination with the ReplayBuffer. I have tuned the hyperparameters in a lot of 
+  different ways; however, it seems that with the 1-hot-encoding, the model is stuck in a suboptimal hyperplane and does not recover. I have therefore started
+  training from scratch on the already mentioned high quality ReplayBuffer and use this as a final model (14.12.2024)
+- While I do see a lot of progress in terms of game smartness, Othello is a game where 1 or 2 wrong moves at a wrong time make the long term difference. A tactic
+  that I regularly use against this bot is by pursuing 3 goals sequentially: 
+  1. Be the first to reach a wall, fight for wall dominance at all costs, 
+  2. after establishing wall dominance, push towards the next corner but avoid setting a next-to-corner stone at all costs (for top left corner, this would be 
+     B1, A2, B2) in order to get the first corner,
+  3. Starting from the conquered corner, flip all stones nearby to own color and ignore the rest of the field. Once a corner is conquered, it cannot be flipped anymore
+     by the opponent. By flipping the stones next to that corner, more and more stones become unflippable for the opponent, leading to a slow but sure win.
+  
+  - I have tried out various different tactics playing against the Alpha Zero Agent, and with this 3-step-plan I basically never lost. Different tactics led to the AlphaZeroAgent
+    having the edge. That opinion is rather difficult to evaluate, because one could argue that I probably have played worse than I could have. However, one pattern 
+    
 
 
 # How this project turned out

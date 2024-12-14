@@ -9,9 +9,10 @@ import argparse
 from src.agents.simple_agents import *
 from src.agents.alpha_zero import *
 from src.environment.board import *
+from src.utils.nn_helpers import get_device
 
 # Note: CUT STARTING AT episodes!
-BEST_MODEL = 'cp_alphazero_residuals_humanplayed_0.001_lr'
+BEST_MODEL = 'cp_alphazero_final_0.001_lr'
 
 
 def parse_args():
