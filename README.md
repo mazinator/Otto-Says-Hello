@@ -60,7 +60,7 @@ However, three different approaches will be implemented:
 
 ![](pic.jpg)
 
-Me three weeks after writing all that stuff above.
+Me three weeks after writing all that stuff above :D 
 
 ### File descriptions
 
