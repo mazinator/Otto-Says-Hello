@@ -58,7 +58,7 @@ However, three different approaches will be implemented:
 
 ## Deliverables for Submission 2
 
-![Me three weeks after writing all that stuff above](pic.jpg)
+![](pic.jpg)
 
 Me three weeks after writing all that stuff above.
 
