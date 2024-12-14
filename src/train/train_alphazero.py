@@ -46,7 +46,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
                 model_loaded=False, episode_loaded=None, c=10e-4, simulations_between_training=50,
                 epochs_for_batches=20, mcts_max_time=1000, mcts_exploration_constant = math.sqrt(2),
                 replay_buffer_in=None, replay_buffer_out=None, replay_buffer_folder_path=None,
-                mcts_only=False, model_file_out_prefix=None, buffer_capacity=40000) -> None:
+                mcts_only=False, model_file_out_prefix=None, buffer_capacity=40000, lr_decay=1.0) -> None:
     """
     Trains an agent on selfplay.
 
@@ -196,6 +196,11 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
                 loss.backward()
                 optimizer.step()
 
+                if i > 10000:  # Example: change learning rate at epoch 5
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = param_group['lr'] * lr_decay
+                    print(f"Learning rate changed to {param_group['lr']}")
+
         # Create checkpoint
         if (episode + 1) % checkpoint_interval == 0:
             model_file_out_name = f"{model_file_out_prefix}_{episode}_episodes.pth"
@@ -208,7 +213,7 @@ def train_agent(board, model, optimizer, episodes=sys.maxsize, batch_size=64, ch
 
 if __name__ == '__main__':
 
-    learning_rate = 0.001
+    learning_rate = 0.005
     learning_rate_load_from = 0.001
 
     # Load Othello-Board
@@ -218,7 +223,7 @@ if __name__ == '__main__':
     model = AlphaZeroNetWithResiduals(8, 8)
 
     # Try to retrieve past model with given learning rate
-    model_load_prefix = f'cp_alphazero_residuals_{learning_rate_load_from}_lr'
+    model_load_prefix = f'cp_alphazero_residuals_humanplayed_{learning_rate_load_from}_lr'
     model, episode = load_model(model_load_prefix, model)
 
     # Set optimizer
@@ -227,18 +232,19 @@ if __name__ == '__main__':
     # Multiple further (hyper)parameters needed for training
     model_loaded = True
     episode_loaded = episode
-    checkpoint_interval = 1000#151
-    batch_size = 64#32
+    checkpoint_interval = 1#151
+    batch_size = 32
     epochs_for_batches = 15000#15
-    mcts_max_time = 1000
+    mcts_max_time = 100
     simulations_between_training = 1#150
     mcts_exploration_constant = 10
-    replay_buffer_in = 'replay_buffer_human.pth'#'replay_buffer_alphazero.pth'
-    replay_buffer_out = None #'replay_buffer_alphazero.pth'
+    replay_buffer_in = 'replay_buffer_alphazero_5000.pth'#'replay_buffer_human.pth'#
+    replay_buffer_out = None#'replay_buffer_alphazero_5000_cont.pth'
     replay_buffer_folder_path = '../../data/'
-    model_file_out_prefix = f"cp_alphazero_residuals_humanplayed_{optimizer.param_groups[0]['lr']}_lr"
-    episode = episode + 2#sys.maxsize
+    model_file_out_prefix = f"cp_alphazero_final_{optimizer.param_groups[0]['lr']}_lr"
+    episode = episode + 1#sys.maxsize
     buffer_capacity = 2000000#40000
+    lr_decay=0.995
 
     # Train the model
     train_agent(board, model, optimizer, model_loaded=model_loaded, episode_loaded=episode_loaded,
@@ -246,31 +252,5 @@ if __name__ == '__main__':
                 mcts_max_time=mcts_max_time, simulations_between_training=simulations_between_training,
                 mcts_exploration_constant=mcts_exploration_constant, replay_buffer_in=replay_buffer_in,
                 replay_buffer_out=replay_buffer_out, replay_buffer_folder_path=replay_buffer_folder_path,
-                model_file_out_prefix=model_file_out_prefix, episodes=episode, buffer_capacity=buffer_capacity)
-
-
-"""
-Folgender Plan:
-
-TODO vor submission 2: final error metrics eintragen in README
-
-den aktuellen Buffer nach episode 100 separat abspeichern, weil high quality buffer.
-
-danach mcts_max_time reduzieren auf 1sec, aber nur 15 epochs trainieren weil schlechtere game quality
-adjust exploration rate von MCTS high für diese zeit. include warm-up period bis der buffer voll ist!
-
-after 1-2 days, reduce learning rate, reduce exploration rate, 
-
-
-Early Training (First 1000 Episodes):
-Batch size: 32 (current setting is fine).
-mcts_max_time: 1000–3000 ms (reduce for faster iteration).
-Simulations between training: 100–200.
-Epochs for batches: 10–20.
-
-Mid to Late Training (After 1000 Episodes):
-Batch size: 64 (if memory allows).
-mcts_max_time: 5000 ms (keep or increase for better search depth).
-Simulations between training: 50 (current setting is fine).
-Epochs for batches: 30–40.
-"""
+                model_file_out_prefix=model_file_out_prefix, episodes=episode, buffer_capacity=buffer_capacity,
+                lr_decay=lr_decay)

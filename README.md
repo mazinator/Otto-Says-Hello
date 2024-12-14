@@ -207,21 +207,30 @@ A few weeks later. Actually achieved error metric:
 - Looks good. (10.12.2024)
 - I fitted around 100 batches of size 32 with rather low quality MCTS-simulations (only around 80 simulations per state) and almost lost against the agent, 
   it definitely something meaningful. (10.12.2024)
-- Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me easily. (11.12.2024)
+- Trained the model on the 25.000 games from eOthello (games from the top 100 players of eOthello) for 100 episodes with batch size 32. It now beats me in 
+  most of the cases. (11.12.2024)
+- Over the past 5 days and around 120 hours of total simulation time, I have created a rather sophisticated ReplayBuffer with the most qualitative simulations I can
+  afford with my laptop. There are currently 51000 samples in the ReplayBuffer, the final hour has come. The model will now be trained with a decaying learning rate. 
+  (14.12.2024)
+- I am not sure however how the fact that I used 1-hot-encoded games from humans as a kickstart will influence the training. The problem is that my initially learned
+  value function was probably fitted to a straightforward 'decision' instead of a distribution. I stopped the human-based training with a value loss of around 0.001,
+  now I have a value of around 32, indicating exactly what I just have stated. To counteract this, I will start with a very high learning rate, which decays for quite 
+  a while. Combining this with a lot of episodes, this should lead to a shameless overfit on the training data. However, I would argue that overfitting is not an issue
+  here. Ideally, all relevant board states are already in the training data, so there is 'nothing new' I would argue. 
 
 
 # How this project turned out
 
 Quick ragequit about myself:
 The magnitude of how much I underestimated the work necessary to reach my original goals is laughable. They maybe would have been somewhat realistic if it was my 5th 
-big reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the alpha zero architecture mid-november, the 
+reinforcement project. Excluding sandboxes, this was my first bigger reinforcement project. Before even starting with the alpha zero architecture mid-november, the 
 level of research and learning I had just on the topic of reinforcement learning was really unexpected given that I already had a solid theoretical background based 
 on the [Sutton&Barto](http://incompleteideas.net/book/the-book-2nd.html) book. For example, I spent 2-3 hours in understanding the MuZero architecture before realising that it is an overkill for problems without 
 hidden states such as Blackjack. I have spent about 10 hours just into researching different theoretical approaches just to realize that I don't have the computational 
 resources for most of them. I had a lot of long nights and weekends on this topic, read papers, watched videos (shoutout to [Yannic Kilcher](https://www.youtube.com/@YannicKilcher)),
 and in the end I'm just happy that I learned a lot and have at least one solid agent based on the original AlphaZero architecture.
 
-Overall, I still feel like it was a great project:
+Overall, I still feel like it was a good experience:
 
 
 * I learned a lot about constructing good test cases,

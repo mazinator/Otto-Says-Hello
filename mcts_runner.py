@@ -1,5 +1,7 @@
-"""This part is used to create a more precise ReplayBuffer in parallel to training the model
-on a ReplayBuffer with a smaller iteration_time on the MCTS.
+"""
+This part is used to create a more precise ReplayBuffer in parallel to training the model
+on a ReplayBuffer with a bigger iteration_time on the MCTS. It should represent actions 
+which are
 """
 
 from torch.optim.adam import Adam
@@ -38,10 +40,11 @@ if __name__ == '__main__':
     replay_buffer_out = 'replay_buffer_alphazero_5000.pth'
     replay_buffer_folder_path = 'data/'
     mcts_only = True
+    buffer_capacity = 60000
 
     train_agent(board, model, optimizer, model_loaded=model_loaded, episode_loaded=episode_loaded,
                 checkpoint_interval=checkpoint_interval, batch_size=batch_size, epochs_for_batches=epochs_for_batches,
                 mcts_max_time=mcts_max_time, simulations_between_training=simulations_between_training,
                 mcts_exploration_constant=mcts_exploration_constant, replay_buffer_in=replay_buffer_in,
                 replay_buffer_out=replay_buffer_out, replay_buffer_folder_path=replay_buffer_folder_path,
-                mcts_only=mcts_only)
+                mcts_only=mcts_only, buffer_capacity=buffer_capacity)
